@@ -3,6 +3,9 @@
 Este repositorio contiene el código fuente de **TS-Tools replacement**, una biblioteca de Python diseñada para simplificar y optimizar la interacción con la **API de Tiendanube**. 
 Su objetivo principal es facilitar la ejecución de requests (individuales o masivos), gestionando eficientemente los rate limits impuestos para cada tienda.
 
+## Video Showcase (muy resumido)
+https://drive.google.com/file/d/1TGpAv7oRqrUDhZMkNel1sRHxn-I1NuQ8/view?usp=sharing
+
 ## Instalación
 
 Si bien el proyecto está en progreso y aún no está en completo, se encuentra en condiciones de que sus componentes sean utilizados.
