@@ -1,0 +1,248 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>rate_limit_schemas &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">rate_limit_schemas</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para rate_limit_schemas</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines Pydantic models and constants for managing API rate limits.</span>
+
+<span class="sd">This module provides a base `RateLimit` model and specific subclasses</span>
+<span class="sd">(`OldLimit`, `StorefrontLimit`, `BoostLimit`) representing different</span>
+<span class="sd">rate limit profiles commonly encountered in APIs (e.g., Shopify).</span>
+<span class="sd">It also defines constants for burst limits and sustained rates associated</span>
+<span class="sd">with these profiles.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span>
+
+<span class="c1"># --- Rate Limit Constants ---</span>
+<span class="c1"># These constants define typical values for different rate limit types.</span>
+<span class="c1"># They are used to initialize the specific RateLimit subclasses.</span>
+
+<span class="c1">#: Burst limit for the older/standard API rate limit (requests).</span>
+<span class="n">OLD_LIMIT</span> <span class="o">=</span> <span class="mi">500</span>
+<span class="c1">#: Sustained rate for the older/standard API rate limit (requests per second).</span>
+<span class="n">OLD_RATE</span>  <span class="o">=</span> <span class="mf">1.7</span>
+<span class="c1">#: Identifier tag for the older/standard rate limit.</span>
+<span class="n">OLD_TAG</span> <span class="o">=</span> <span class="s1">&#39;rate-limit-old&#39;</span>
+
+<span class="c1">#: Burst limit for the Storefront API rate limit (requests).</span>
+<span class="n">STOREFRONT_LIMIT</span> <span class="o">=</span> <span class="mi">1000</span>
+<span class="c1">#: Sustained rate for the Storefront API rate limit (requests per second).</span>
+<span class="n">STOREFRONT_RATE</span>  <span class="o">=</span> <span class="mi">100</span>
+<span class="c1">#: Identifier tag for the Storefront rate limit.</span>
+<span class="n">STOREFRONT_TAG</span>  <span class="o">=</span> <span class="s1">&#39;rate-limit-storefront&#39;</span>
+
+<span class="c1">#: Burst limit for the Boost API (e.g., Shopify Plus high-volume API) rate limit (requests).</span>
+<span class="n">BOOST_LIMIT</span> <span class="o">=</span> <span class="mi">400</span>
+<span class="c1">#: Sustained rate for the Boost API rate limit (requests per second).</span>
+<span class="n">BOOST_RATE</span>  <span class="o">=</span> <span class="mi">20</span>
+<span class="c1">#: Identifier tag for the Boost API rate limit.</span>
+<span class="n">BOOST_TAG</span>   <span class="o">=</span> <span class="s1">&#39;boost-api-rate-limit&#39;</span>
+
+<span class="c1"># --- Rate Limit Pydantic Models ---</span>
+
+<div class="viewcode-block" id="RateLimit">
+<a class="viewcode-back" href="../rate_limit_schemas.html#rate_limit_schemas.RateLimit">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RateLimit</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base model representing API rate limit parameters.</span>
+
+<span class="sd">    Defines common attributes for controlling request frequency, concurrency,</span>
+<span class="sd">    and timeouts. The `delay_between_requests` is calculated automatically</span>
+<span class="sd">    based on the `sustained_rate_rps`.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        burst_limit (int): The maximum number of requests allowed in a short burst.</span>
+<span class="sd">                           Typically corresponds to the bucket size in a token bucket algorithm.</span>
+<span class="sd">        sustained_rate_rps (float): The average number of requests allowed per second</span>
+<span class="sd">                                    over a longer period. Corresponds to the token refill rate.</span>
+<span class="sd">        delay_between_requests (float): The calculated minimum delay (in seconds)</span>
+<span class="sd">                                        required between requests to maintain the sustained rate.</span>
+<span class="sd">                                        Automatically computed from `sustained_rate_rps`.</span>
+<span class="sd">        max_concurrent_requests (int): The maximum number of requests that can be</span>
+<span class="sd">                                       in flight simultaneously.</span>
+<span class="sd">        request_timeout (float): The maximum time (in seconds) to wait for a response</span>
+<span class="sd">                                 for a single API request before timing out.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">burst_limit</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">40</span>  <span class="c1"># Default burst limit</span>
+    <span class="n">sustained_rate_rps</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mi">2</span> <span class="c1"># Default sustained rate (requests per second)</span>
+    <span class="c1"># Calculate delay automatically based on the sustained rate</span>
+    <span class="n">delay_between_requests</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sustained_rate_rps</span> <span class="k">if</span> <span class="n">sustained_rate_rps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span>
+
+    <span class="n">max_concurrent_requests</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="mi">400</span> <span class="c1"># Default max concurrent requests</span>
+    <span class="n">request_timeout</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">60.0</span> <span class="c1"># Default timeout per request (seconds)</span></div>
+
+
+    <span class="c1"># Pydantic v2 uses model_post_init for logic after initialization if needed,</span>
+    <span class="c1"># but here the calculation is simple enough to be done directly in the field definition.</span>
+    <span class="c1"># If more complex logic were needed:</span>
+    <span class="c1"># from pydantic import model_validator</span>
+    <span class="c1"># @model_validator(mode=&#39;after&#39;)</span>
+    <span class="c1"># def calculate_delay(self) -&gt; &#39;RateLimit&#39;:</span>
+    <span class="c1">#     if self.sustained_rate_rps &gt; 0:</span>
+    <span class="c1">#         self.delay_between_requests = 1.0 / self.sustained_rate_rps</span>
+    <span class="c1">#     else:</span>
+    <span class="c1">#         self.delay_between_requests = float(&#39;inf&#39;)</span>
+    <span class="c1">#     return self</span>
+
+
+<div class="viewcode-block" id="OldLimit">
+<a class="viewcode-back" href="../rate_limit_schemas.html#rate_limit_schemas.OldLimit">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">OldLimit</span><span class="p">(</span><span class="n">RateLimit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rate limit settings corresponding to the older/standard API limits.</span>
+
+<span class="sd">    Inherits from `RateLimit` and overrides defaults with values from</span>
+<span class="sd">    `OLD_LIMIT` and `OLD_RATE`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">burst_limit</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">OLD_LIMIT</span>
+    <span class="n">sustained_rate_rps</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">OLD_RATE</span>
+    <span class="c1"># Recalculate delay based on specific rate</span>
+    <span class="n">delay_between_requests</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sustained_rate_rps</span> <span class="k">if</span> <span class="n">sustained_rate_rps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="StorefrontLimit">
+<a class="viewcode-back" href="../rate_limit_schemas.html#rate_limit_schemas.StorefrontLimit">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">StorefrontLimit</span><span class="p">(</span><span class="n">RateLimit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rate limit settings corresponding to the Storefront API limits.</span>
+
+<span class="sd">    Inherits from `RateLimit` and overrides defaults with values from</span>
+<span class="sd">    `STOREFRONT_LIMIT` and `STOREFRONT_RATE`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">burst_limit</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">STOREFRONT_LIMIT</span>
+    <span class="n">sustained_rate_rps</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">STOREFRONT_RATE</span>
+    <span class="c1"># Recalculate delay based on specific rate</span>
+    <span class="n">delay_between_requests</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sustained_rate_rps</span> <span class="k">if</span> <span class="n">sustained_rate_rps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="BoostLimit">
+<a class="viewcode-back" href="../rate_limit_schemas.html#rate_limit_schemas.BoostLimit">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">BoostLimit</span><span class="p">(</span><span class="n">RateLimit</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Rate limit settings corresponding to the Boost API (high-volume) limits.</span>
+
+<span class="sd">    Inherits from `RateLimit` and overrides defaults with values from</span>
+<span class="sd">    `BOOST_LIMIT` and `BOOST_RATE`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">burst_limit</span><span class="p">:</span><span class="nb">int</span> <span class="o">=</span> <span class="n">BOOST_LIMIT</span>
+    <span class="n">sustained_rate_rps</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="n">BOOST_RATE</span>
+    <span class="c1"># Recalculate delay based on specific rate</span>
+    <span class="n">delay_between_requests</span><span class="p">:</span><span class="nb">float</span> <span class="o">=</span> <span class="mf">1.0</span> <span class="o">/</span> <span class="n">sustained_rate_rps</span> <span class="k">if</span> <span class="n">sustained_rate_rps</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="nb">float</span><span class="p">(</span><span class="s1">&#39;inf&#39;</span><span class="p">)</span></div>
+
+
+<span class="c1"># --- Example Usage ---</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example block demonstrating how to instantiate and view a rate limit model.</span>
+<span class="sd">    This only runs when the script is executed directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--- Rate Limit Schema Example ---&quot;</span><span class="p">)</span>
+    <span class="n">test_limit</span> <span class="o">=</span> <span class="n">BoostLimit</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;BoostLimit instance:&quot;</span><span class="p">)</span>
+    <span class="c1"># model_dump() is the Pydantic v2 equivalent of .dict()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">test_limit</span><span class="o">.</span><span class="n">model_dump</span><span class="p">())</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--- Example End ---&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,484 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esquemas de Validación (validation_schemas) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="prev" title="Esquemas de Petición (request_schemas)" href="request_schemas.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Esquemas (<cite>schemas</cite>)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config_schemas.html">Esquemas de Configuración (<cite>config_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="endpoint_config.html">Configuración de Endpoints (<cite>endpoint_config</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="endpoint_map.html">Mapa de Endpoints (<cite>endpoint_map</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="request_schemas.html">Esquemas de Petición (<cite>request_schemas</cite>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Esquemas de Validación (<cite>validation_schemas</cite>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.validation_schemas.Categories"><code class="docutils literal notranslate"><span class="pre">Categories</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Categories.description"><code class="docutils literal notranslate"><span class="pre">Categories.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Categories.handle"><code class="docutils literal notranslate"><span class="pre">Categories.handle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Categories.model_config"><code class="docutils literal notranslate"><span class="pre">Categories.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Categories.name"><code class="docutils literal notranslate"><span class="pre">Categories.name</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.validation_schemas.Product"><code class="docutils literal notranslate"><span class="pre">Product</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.attributes"><code class="docutils literal notranslate"><span class="pre">Product.attributes</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.categories"><code class="docutils literal notranslate"><span class="pre">Product.categories</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.description"><code class="docutils literal notranslate"><span class="pre">Product.description</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.handle"><code class="docutils literal notranslate"><span class="pre">Product.handle</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.model_config"><code class="docutils literal notranslate"><span class="pre">Product.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.name"><code class="docutils literal notranslate"><span class="pre">Product.name</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Product.variants"><code class="docutils literal notranslate"><span class="pre">Product.variants</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.validation_schemas.ValidationModel"><code class="docutils literal notranslate"><span class="pre">ValidationModel</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.ValidationModel.json"><code class="docutils literal notranslate"><span class="pre">ValidationModel.json()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.ValidationModel.model_config"><code class="docutils literal notranslate"><span class="pre">ValidationModel.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.ValidationModel.model_post_init"><code class="docutils literal notranslate"><span class="pre">ValidationModel.model_post_init()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.validation_schemas.Variant"><code class="docutils literal notranslate"><span class="pre">Variant</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.age_group"><code class="docutils literal notranslate"><span class="pre">Variant.age_group</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.barcode"><code class="docutils literal notranslate"><span class="pre">Variant.barcode</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.compare_at_price"><code class="docutils literal notranslate"><span class="pre">Variant.compare_at_price</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.cost"><code class="docutils literal notranslate"><span class="pre">Variant.cost</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.created_at"><code class="docutils literal notranslate"><span class="pre">Variant.created_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.depth"><code class="docutils literal notranslate"><span class="pre">Variant.depth</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.gender"><code class="docutils literal notranslate"><span class="pre">Variant.gender</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.height"><code class="docutils literal notranslate"><span class="pre">Variant.height</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.id"><code class="docutils literal notranslate"><span class="pre">Variant.id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.image_id"><code class="docutils literal notranslate"><span class="pre">Variant.image_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.model_config"><code class="docutils literal notranslate"><span class="pre">Variant.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.mpn"><code class="docutils literal notranslate"><span class="pre">Variant.mpn</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.option_value_1"><code class="docutils literal notranslate"><span class="pre">Variant.option_value_1</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.option_value_2"><code class="docutils literal notranslate"><span class="pre">Variant.option_value_2</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.option_value_3"><code class="docutils literal notranslate"><span class="pre">Variant.option_value_3</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.position"><code class="docutils literal notranslate"><span class="pre">Variant.position</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.price"><code class="docutils literal notranslate"><span class="pre">Variant.price</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.product_id"><code class="docutils literal notranslate"><span class="pre">Variant.product_id</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.promotional_price"><code class="docutils literal notranslate"><span class="pre">Variant.promotional_price</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.sku"><code class="docutils literal notranslate"><span class="pre">Variant.sku</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.stock"><code class="docutils literal notranslate"><span class="pre">Variant.stock</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.stock_management"><code class="docutils literal notranslate"><span class="pre">Variant.stock_management</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.updated_at"><code class="docutils literal notranslate"><span class="pre">Variant.updated_at</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.values"><code class="docutils literal notranslate"><span class="pre">Variant.values</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.weight"><code class="docutils literal notranslate"><span class="pre">Variant.weight</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.Variant.width"><code class="docutils literal notranslate"><span class="pre">Variant.width</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.validation_schemas.i18nField"><code class="docutils literal notranslate"><span class="pre">i18nField</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.i18nField.en"><code class="docutils literal notranslate"><span class="pre">i18nField.en</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.i18nField.es"><code class="docutils literal notranslate"><span class="pre">i18nField.es</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.i18nField.model_config"><code class="docutils literal notranslate"><span class="pre">i18nField.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.validation_schemas.i18nField.pt"><code class="docutils literal notranslate"><span class="pre">i18nField.pt</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Esquemas (<cite>schemas</cite>)</a></li>
+      <li class="breadcrumb-item active">Esquemas de Validación (<cite>validation_schemas</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/schemas/validation_schemas.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="esquemas-de-validacion-validation-schemas">
+<h1>Esquemas de Validación (<cite>validation_schemas</cite>)<a class="headerlink" href="#esquemas-de-validacion-validation-schemas" title="Link to this heading"></a></h1>
+<dl class="py class" id="module-schemas.validation_schemas">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Categories">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.validation_schemas.</span></span><span class="sig-name descname"><span class="pre">Categories</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#Categories"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.Categories" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Categories.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Categories.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Categories.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Categories.handle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Categories.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.validation_schemas.Categories.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Categories.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Categories.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.validation_schemas.</span></span><span class="sig-name descname"><span class="pre">Product</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#Product"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.Product" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.attributes">
+<span class="sig-name descname"><span class="pre">attributes</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.attributes" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.categories">
+<span class="sig-name descname"><span class="pre">categories</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.Categories" title="schemas.validation_schemas.Categories"><code class="xref py py-class docutils literal notranslate"><span class="pre">Categories</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.categories" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.description">
+<span class="sig-name descname"><span class="pre">description</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.description" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.handle">
+<span class="sig-name descname"><span class="pre">handle</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.handle" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.name">
+<span class="sig-name descname"><span class="pre">name</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.name" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Product.variants">
+<span class="sig-name descname"><span class="pre">variants</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.Variant" title="schemas.validation_schemas.Variant"><code class="xref py py-class docutils literal notranslate"><span class="pre">Variant</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.validation_schemas.Product.variants" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.validation_schemas.ValidationModel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.validation_schemas.</span></span><span class="sig-name descname"><span class="pre">ValidationModel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#ValidationModel"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.ValidationModel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Modelo base para la validación de datos.
+Se puede extender para incluir validaciones específicas según el endpoint.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.validation_schemas.ValidationModel.json">
+<span class="sig-name descname"><span class="pre">json</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">kwargs</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#ValidationModel.json"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.ValidationModel.json" title="Link to this definition"></a></dt>
+<dd><p>Serializa el modelo a JSON.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>kwargs</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.ValidationModel.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.validation_schemas.ValidationModel.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.validation_schemas.ValidationModel.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_ValidationModel__context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#ValidationModel.model_post_init"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.ValidationModel.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>Se ejecuta después de la inicialización y validación.
+Elimina los atributos de esta instancia que tengan valor None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>_ValidationModel__context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.validation_schemas.</span></span><span class="sig-name descname"><span class="pre">Variant</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#Variant"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.Variant" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.age_group">
+<span class="sig-name descname"><span class="pre">age_group</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.age_group" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.barcode">
+<span class="sig-name descname"><span class="pre">barcode</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.barcode" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.compare_at_price">
+<span class="sig-name descname"><span class="pre">compare_at_price</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.compare_at_price" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.cost">
+<span class="sig-name descname"><span class="pre">cost</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.cost" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.created_at">
+<span class="sig-name descname"><span class="pre">created_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.created_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.depth">
+<span class="sig-name descname"><span class="pre">depth</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.depth" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.gender">
+<span class="sig-name descname"><span class="pre">gender</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.gender" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.height">
+<span class="sig-name descname"><span class="pre">height</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.height" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.id">
+<span class="sig-name descname"><span class="pre">id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.image_id">
+<span class="sig-name descname"><span class="pre">image_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.image_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.mpn">
+<span class="sig-name descname"><span class="pre">mpn</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.mpn" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.option_value_1">
+<span class="sig-name descname"><span class="pre">option_value_1</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.option_value_1" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.option_value_2">
+<span class="sig-name descname"><span class="pre">option_value_2</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.option_value_2" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.option_value_3">
+<span class="sig-name descname"><span class="pre">option_value_3</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.option_value_3" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.position">
+<span class="sig-name descname"><span class="pre">position</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.position" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.price">
+<span class="sig-name descname"><span class="pre">price</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.price" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.product_id">
+<span class="sig-name descname"><span class="pre">product_id</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.product_id" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.promotional_price">
+<span class="sig-name descname"><span class="pre">promotional_price</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.promotional_price" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.sku">
+<span class="sig-name descname"><span class="pre">sku</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.sku" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.stock">
+<span class="sig-name descname"><span class="pre">stock</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.stock" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.stock_management">
+<span class="sig-name descname"><span class="pre">stock_management</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.stock_management" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.updated_at">
+<span class="sig-name descname"><span class="pre">updated_at</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.updated_at" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.values">
+<span class="sig-name descname"><span class="pre">values</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.List" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">List</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.validation_schemas.i18nField" title="schemas.validation_schemas.i18nField"><code class="xref py py-class docutils literal notranslate"><span class="pre">i18nField</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.values" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.weight">
+<span class="sig-name descname"><span class="pre">weight</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.weight" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.Variant.width">
+<span class="sig-name descname"><span class="pre">width</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Union" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Union</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.Variant.width" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.validation_schemas.i18nField">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.validation_schemas.</span></span><span class="sig-name descname"><span class="pre">i18nField</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/validation_schemas.html#i18nField"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.validation_schemas.i18nField" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationModel</span></code></a></p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.i18nField.en">
+<span class="sig-name descname"><span class="pre">en</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.i18nField.en" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.i18nField.es">
+<span class="sig-name descname"><span class="pre">es</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.i18nField.es" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.i18nField.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.validation_schemas.i18nField.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.validation_schemas.i18nField.pt">
+<span class="sig-name descname"><span class="pre">pt</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.validation_schemas.i18nField.pt" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="request_schemas.html" class="btn btn-neutral float-left" title="Esquemas de Petición (request_schemas)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

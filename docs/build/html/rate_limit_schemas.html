@@ -1,0 +1,383 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esquemas de Rate Limit (rate_limit_schemas) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Esquemas (schemas)" href="schemas/index.html" />
+    <link rel="prev" title="Configuraciones del Logger (logger_settings)" href="logger_settings.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.BOOST_LIMIT"><code class="docutils literal notranslate"><span class="pre">BOOST_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.BOOST_RATE"><code class="docutils literal notranslate"><span class="pre">BOOST_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.BOOST_TAG"><code class="docutils literal notranslate"><span class="pre">BOOST_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.BoostLimit"><code class="docutils literal notranslate"><span class="pre">BoostLimit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.BoostLimit.burst_limit"><code class="docutils literal notranslate"><span class="pre">BoostLimit.burst_limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.BoostLimit.delay_between_requests"><code class="docutils literal notranslate"><span class="pre">BoostLimit.delay_between_requests</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.BoostLimit.model_config"><code class="docutils literal notranslate"><span class="pre">BoostLimit.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.BoostLimit.sustained_rate_rps"><code class="docutils literal notranslate"><span class="pre">BoostLimit.sustained_rate_rps</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.OLD_LIMIT"><code class="docutils literal notranslate"><span class="pre">OLD_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.OLD_RATE"><code class="docutils literal notranslate"><span class="pre">OLD_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.OLD_TAG"><code class="docutils literal notranslate"><span class="pre">OLD_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.OldLimit"><code class="docutils literal notranslate"><span class="pre">OldLimit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.OldLimit.burst_limit"><code class="docutils literal notranslate"><span class="pre">OldLimit.burst_limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.OldLimit.delay_between_requests"><code class="docutils literal notranslate"><span class="pre">OldLimit.delay_between_requests</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.OldLimit.model_config"><code class="docutils literal notranslate"><span class="pre">OldLimit.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.OldLimit.sustained_rate_rps"><code class="docutils literal notranslate"><span class="pre">OldLimit.sustained_rate_rps</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.RateLimit"><code class="docutils literal notranslate"><span class="pre">RateLimit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.burst_limit"><code class="docutils literal notranslate"><span class="pre">RateLimit.burst_limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.delay_between_requests"><code class="docutils literal notranslate"><span class="pre">RateLimit.delay_between_requests</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.max_concurrent_requests"><code class="docutils literal notranslate"><span class="pre">RateLimit.max_concurrent_requests</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.model_config"><code class="docutils literal notranslate"><span class="pre">RateLimit.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.request_timeout"><code class="docutils literal notranslate"><span class="pre">RateLimit.request_timeout</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.RateLimit.sustained_rate_rps"><code class="docutils literal notranslate"><span class="pre">RateLimit.sustained_rate_rps</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.STOREFRONT_LIMIT"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.STOREFRONT_RATE"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.STOREFRONT_TAG"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#rate_limit_schemas.StorefrontLimit"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.StorefrontLimit.burst_limit"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit.burst_limit</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.StorefrontLimit.delay_between_requests"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit.delay_between_requests</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.StorefrontLimit.model_config"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#rate_limit_schemas.StorefrontLimit.sustained_rate_rps"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit.sustained_rate_rps</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/rate_limit_schemas.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="esquemas-de-rate-limit-rate-limit-schemas">
+<h1>Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)<a class="headerlink" href="#esquemas-de-rate-limit-rate-limit-schemas" title="Link to this heading"></a></h1>
+<p id="module-rate_limit_schemas">Defines Pydantic models and constants for managing API rate limits.</p>
+<p>This module provides a base <cite>RateLimit</cite> model and specific subclasses
+(<cite>OldLimit</cite>, <cite>StorefrontLimit</cite>, <cite>BoostLimit</cite>) representing different
+rate limit profiles commonly encountered in APIs (e.g., Shopify).
+It also defines constants for burst limits and sustained rates associated
+with these profiles.</p>
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.BOOST_LIMIT">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">BOOST_LIMIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">400</span></em><a class="headerlink" href="#rate_limit_schemas.BOOST_LIMIT" title="Link to this definition"></a></dt>
+<dd><p>Burst limit for the Boost API (e.g., Shopify Plus high-volume API) rate limit (requests).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.BOOST_RATE">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">BOOST_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">20</span></em><a class="headerlink" href="#rate_limit_schemas.BOOST_RATE" title="Link to this definition"></a></dt>
+<dd><p>Sustained rate for the Boost API rate limit (requests per second).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.BOOST_TAG">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">BOOST_TAG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'boost-api-rate-limit'</span></em><a class="headerlink" href="#rate_limit_schemas.BOOST_TAG" title="Link to this definition"></a></dt>
+<dd><p>Identifier tag for the Boost API rate limit.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rate_limit_schemas.BoostLimit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">BoostLimit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rate_limit_schemas.html#BoostLimit"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#rate_limit_schemas.BoostLimit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rate_limit_schemas.RateLimit" title="rate_limit_schemas.RateLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimit</span></code></a></p>
+<p>Rate limit settings corresponding to the Boost API (high-volume) limits.</p>
+<p>Inherits from <cite>RateLimit</cite> and overrides defaults with values from
+<cite>BOOST_LIMIT</cite> and <cite>BOOST_RATE</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.BoostLimit.burst_limit">
+<span class="sig-name descname"><span class="pre">burst_limit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.BoostLimit.burst_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.BoostLimit.delay_between_requests">
+<span class="sig-name descname"><span class="pre">delay_between_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.BoostLimit.delay_between_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.BoostLimit.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rate_limit_schemas.BoostLimit.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.BoostLimit.sustained_rate_rps">
+<span class="sig-name descname"><span class="pre">sustained_rate_rps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.BoostLimit.sustained_rate_rps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.OLD_LIMIT">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">OLD_LIMIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">500</span></em><a class="headerlink" href="#rate_limit_schemas.OLD_LIMIT" title="Link to this definition"></a></dt>
+<dd><p>Burst limit for the older/standard API rate limit (requests).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.OLD_RATE">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">OLD_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1.7</span></em><a class="headerlink" href="#rate_limit_schemas.OLD_RATE" title="Link to this definition"></a></dt>
+<dd><p>Sustained rate for the older/standard API rate limit (requests per second).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.OLD_TAG">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">OLD_TAG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rate-limit-old'</span></em><a class="headerlink" href="#rate_limit_schemas.OLD_TAG" title="Link to this definition"></a></dt>
+<dd><p>Identifier tag for the older/standard rate limit.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rate_limit_schemas.OldLimit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">OldLimit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rate_limit_schemas.html#OldLimit"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#rate_limit_schemas.OldLimit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rate_limit_schemas.RateLimit" title="rate_limit_schemas.RateLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimit</span></code></a></p>
+<p>Rate limit settings corresponding to the older/standard API limits.</p>
+<p>Inherits from <cite>RateLimit</cite> and overrides defaults with values from
+<cite>OLD_LIMIT</cite> and <cite>OLD_RATE</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.OldLimit.burst_limit">
+<span class="sig-name descname"><span class="pre">burst_limit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.OldLimit.burst_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.OldLimit.delay_between_requests">
+<span class="sig-name descname"><span class="pre">delay_between_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.OldLimit.delay_between_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.OldLimit.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rate_limit_schemas.OldLimit.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.OldLimit.sustained_rate_rps">
+<span class="sig-name descname"><span class="pre">sustained_rate_rps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.OldLimit.sustained_rate_rps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">RateLimit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rate_limit_schemas.html#RateLimit"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#rate_limit_schemas.RateLimit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Base model representing API rate limit parameters.</p>
+<p>Defines common attributes for controlling request frequency, concurrency,
+and timeouts. The <cite>delay_between_requests</cite> is calculated automatically
+based on the <cite>sustained_rate_rps</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>burst_limit</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><em>int</em></a>) – The maximum number of requests allowed in a short burst.
+Typically corresponds to the bucket size in a token bucket algorithm.</p></li>
+<li><p><strong>sustained_rate_rps</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><em>float</em></a>) – The average number of requests allowed per second
+over a longer period. Corresponds to the token refill rate.</p></li>
+<li><p><strong>delay_between_requests</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><em>float</em></a>) – The calculated minimum delay (in seconds)
+required between requests to maintain the sustained rate.
+Automatically computed from <cite>sustained_rate_rps</cite>.</p></li>
+<li><p><strong>max_concurrent_requests</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><em>int</em></a>) – The maximum number of requests that can be
+in flight simultaneously.</p></li>
+<li><p><strong>request_timeout</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><em>float</em></a>) – The maximum time (in seconds) to wait for a response
+for a single API request before timing out.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.burst_limit">
+<span class="sig-name descname"><span class="pre">burst_limit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.burst_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.delay_between_requests">
+<span class="sig-name descname"><span class="pre">delay_between_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.delay_between_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.max_concurrent_requests">
+<span class="sig-name descname"><span class="pre">max_concurrent_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.max_concurrent_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.request_timeout">
+<span class="sig-name descname"><span class="pre">request_timeout</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.request_timeout" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.RateLimit.sustained_rate_rps">
+<span class="sig-name descname"><span class="pre">sustained_rate_rps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.RateLimit.sustained_rate_rps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.STOREFRONT_LIMIT">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">STOREFRONT_LIMIT</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">1000</span></em><a class="headerlink" href="#rate_limit_schemas.STOREFRONT_LIMIT" title="Link to this definition"></a></dt>
+<dd><p>Burst limit for the Storefront API rate limit (requests).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.STOREFRONT_RATE">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">STOREFRONT_RATE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">100</span></em><a class="headerlink" href="#rate_limit_schemas.STOREFRONT_RATE" title="Link to this definition"></a></dt>
+<dd><p>Sustained rate for the Storefront API rate limit (requests per second).</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="rate_limit_schemas.STOREFRONT_TAG">
+<span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">STOREFRONT_TAG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'rate-limit-storefront'</span></em><a class="headerlink" href="#rate_limit_schemas.STOREFRONT_TAG" title="Link to this definition"></a></dt>
+<dd><p>Identifier tag for the Storefront rate limit.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="rate_limit_schemas.StorefrontLimit">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">rate_limit_schemas.</span></span><span class="sig-name descname"><span class="pre">StorefrontLimit</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/rate_limit_schemas.html#StorefrontLimit"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#rate_limit_schemas.StorefrontLimit" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#rate_limit_schemas.RateLimit" title="rate_limit_schemas.RateLimit"><code class="xref py py-class docutils literal notranslate"><span class="pre">RateLimit</span></code></a></p>
+<p>Rate limit settings corresponding to the Storefront API limits.</p>
+<p>Inherits from <cite>RateLimit</cite> and overrides defaults with values from
+<cite>STOREFRONT_LIMIT</cite> and <cite>STOREFRONT_RATE</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.StorefrontLimit.burst_limit">
+<span class="sig-name descname"><span class="pre">burst_limit</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.StorefrontLimit.burst_limit" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.StorefrontLimit.delay_between_requests">
+<span class="sig-name descname"><span class="pre">delay_between_requests</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.StorefrontLimit.delay_between_requests" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.StorefrontLimit.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#rate_limit_schemas.StorefrontLimit.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="rate_limit_schemas.StorefrontLimit.sustained_rate_rps">
+<span class="sig-name descname"><span class="pre">sustained_rate_rps</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#float" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">float</span></code></a></em><a class="headerlink" href="#rate_limit_schemas.StorefrontLimit.sustained_rate_rps" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="logger_settings.html" class="btn btn-neutral float-left" title="Configuraciones del Logger (logger_settings)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="schemas/index.html" class="btn btn-neutral float-right" title="Esquemas (schemas)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

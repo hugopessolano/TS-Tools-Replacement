@@ -1,0 +1,186 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TS-tools-replacement documentation &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Gestor de DataFrames (dataframe_manager)" href="dataframe_manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="#" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="#">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="#" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">TS-tools-replacement documentation</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/index.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="ts-tools-replacement-documentation">
+<h1>TS-tools-replacement documentation<a class="headerlink" href="#ts-tools-replacement-documentation" title="Link to this heading"></a></h1>
+<div class="toctree-wrapper compound">
+<p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataframe_manager.html#dataframe_manager.DataframeManager"><code class="docutils literal notranslate"><span class="pre">DataframeManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="dataframe_utils.html#dataframe_utils.is_field_type_i18n"><code class="docutils literal notranslate"><span class="pre">is_field_type_i18n()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataframe_utils.html#dataframe_utils.parse_i18n"><code class="docutils literal notranslate"><span class="pre">parse_i18n()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="dataframe_utils.html#dataframe_utils.reformat_payload"><code class="docutils literal notranslate"><span class="pre">reformat_payload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="request_manager.html#request_manager.RequestManager"><code class="docutils literal notranslate"><span class="pre">RequestManager</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="log_db.html">Configuración de Logging (<cite>log_db</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.DB_FILE"><code class="docutils literal notranslate"><span class="pre">DB_FILE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.SQLiteSink"><code class="docutils literal notranslate"><span class="pre">SQLiteSink</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.db_logger"><code class="docutils literal notranslate"><span class="pre">db_logger</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.db_only_logger"><code class="docutils literal notranslate"><span class="pre">db_only_logger</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.is_db"><code class="docutils literal notranslate"><span class="pre">is_db()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.is_db_and_stdout"><code class="docutils literal notranslate"><span class="pre">is_db_and_stdout()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.is_stdout_only"><code class="docutils literal notranslate"><span class="pre">is_stdout_only()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="log_db.html#log_db.stdout_logger"><code class="docutils literal notranslate"><span class="pre">stdout_logger</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.DB_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.DB_ONLY_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_ONLY_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.DB_STDOUT_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_STDOUT_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.LogLevel"><code class="docutils literal notranslate"><span class="pre">LogLevel</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.LoggerSettings"><code class="docutils literal notranslate"><span class="pre">LoggerSettings</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.STDOUT_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">STDOUT_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="logger_settings.html#logger_settings.format_assigner"><code class="docutils literal notranslate"><span class="pre">format_assigner()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.BOOST_LIMIT"><code class="docutils literal notranslate"><span class="pre">BOOST_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.BOOST_RATE"><code class="docutils literal notranslate"><span class="pre">BOOST_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.BOOST_TAG"><code class="docutils literal notranslate"><span class="pre">BOOST_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.BoostLimit"><code class="docutils literal notranslate"><span class="pre">BoostLimit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.OLD_LIMIT"><code class="docutils literal notranslate"><span class="pre">OLD_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.OLD_RATE"><code class="docutils literal notranslate"><span class="pre">OLD_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.OLD_TAG"><code class="docutils literal notranslate"><span class="pre">OLD_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.OldLimit"><code class="docutils literal notranslate"><span class="pre">OldLimit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.RateLimit"><code class="docutils literal notranslate"><span class="pre">RateLimit</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.STOREFRONT_LIMIT"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_LIMIT</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.STOREFRONT_RATE"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_RATE</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.STOREFRONT_TAG"><code class="docutils literal notranslate"><span class="pre">STOREFRONT_TAG</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="rate_limit_schemas.html#rate_limit_schemas.StorefrontLimit"><code class="docutils literal notranslate"><span class="pre">StorefrontLimit</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="schemas/index.html">Esquemas (<cite>schemas</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="schemas/config_schemas.html">Esquemas de Configuración (<cite>config_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemas/endpoint_config.html">Configuración de Endpoints (<cite>endpoint_config</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemas/endpoint_map.html">Mapa de Endpoints (<cite>endpoint_map</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemas/request_schemas.html">Esquemas de Petición (<cite>request_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="schemas/validation_schemas.html">Esquemas de Validación (<cite>validation_schemas</cite>)</a></li>
+</ul>
+</li>
+</ul>
+</div>
+</section>
+<section id="indices-and-tables">
+<h1>Indices and tables<a class="headerlink" href="#indices-and-tables" title="Link to this heading"></a></h1>
+<ul class="simple">
+<li><p><a class="reference internal" href="genindex.html"><span class="std std-ref">Índice</span></a></p></li>
+<li><p><a class="reference internal" href="py-modindex.html"><span class="std std-ref">Índice de Módulos</span></a></p></li>
+<li><p><a class="reference internal" href="search.html"><span class="std std-ref">Página de Búsqueda</span></a></p></li>
+</ul>
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="dataframe_manager.html" class="btn btn-neutral float-right" title="Gestor de DataFrames (dataframe_manager)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

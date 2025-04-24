@@ -1,0 +1,210 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Utilidades de DataFrame (dataframe_utils) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Gestor de Peticiones (request_manager)" href="request_manager.html" />
+    <link rel="prev" title="Gestor de DataFrames (dataframe_manager)" href="dataframe_manager.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe_utils.is_field_type_i18n"><code class="docutils literal notranslate"><span class="pre">is_field_type_i18n()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe_utils.parse_i18n"><code class="docutils literal notranslate"><span class="pre">parse_i18n()</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#dataframe_utils.reformat_payload"><code class="docutils literal notranslate"><span class="pre">reformat_payload()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/dataframe_utils.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="utilidades-de-dataframe-dataframe-utils">
+<h1>Utilidades de DataFrame (<cite>dataframe_utils</cite>)<a class="headerlink" href="#utilidades-de-dataframe-dataframe-utils" title="Link to this heading"></a></h1>
+<p id="module-dataframe_utils">Utility functions for processing and validating DataFrame data, particularly
+for internationalization (i18n) fields and payload reformatting based on Pydantic models.</p>
+<dl class="py function">
+<dt class="sig sig-object py" id="dataframe_utils.is_field_type_i18n">
+<span class="sig-prename descclassname"><span class="pre">dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">is_field_type_i18n</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">field_name</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataframe_utils.html#is_field_type_i18n"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#dataframe_utils.is_field_type_i18n" title="Link to this definition"></a></dt>
+<dd><p>Checks if the type annotation of a field in a Pydantic model is
+i18nField or Optional[i18nField].</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>model</strong> (<em>Type</em><em>[</em><a class="reference internal" href="schemas/validation_schemas.html#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><em>ValidationModel</em></a><em>]</em>) – The Pydantic model class.</p></li>
+<li><p><strong>field_name</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The name of the field to check within the model.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>True if the field type is i18nField or Optional[i18nField],</dt><dd><p>False otherwise.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)">bool</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dataframe_utils.parse_i18n">
+<span class="sig-prename descclassname"><span class="pre">dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">parse_i18n</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">key</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_config</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataframe_utils.html#parse_i18n"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#dataframe_utils.parse_i18n" title="Link to this definition"></a></dt>
+<dd><p>Parses or transforms a value in the payload dictionary for an i18n field.</p>
+<p>If the value is a valid JSON string representing an i18n structure (dict
+with language codes as keys), it’s parsed and used directly.
+Otherwise, the value is replicated for all languages specified in
+<cite>store_config.modify_languages</cite>. Handles potential NaN values from pandas.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>payload_arguments</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – The dictionary containing payload data.
+This dictionary is modified in-place.</p></li>
+<li><p><strong>key</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The key in <cite>payload_arguments</cite> corresponding to the i18n field.</p></li>
+<li><p><strong>store_config</strong> (<a class="reference internal" href="schemas/config_schemas.html#schemas.config_schemas.StoreConfig" title="schemas.config_schemas.StoreConfig"><em>StoreConfig</em></a>) – The store configuration containing language settings.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>The <cite>payload_arguments</cite> dictionary is modified directly.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>None</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="dataframe_utils.reformat_payload">
+<span class="sig-prename descclassname"><span class="pre">dataframe_utils.</span></span><span class="sig-name descname"><span class="pre">reformat_payload</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">payload_arguments</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">keys_to_reformat</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">validation_model</span></span></em>, <em class="sig-param"><span class="n"><span class="pre">store_config</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">StoreConfig(enabled_languages=['es',</span> <span class="pre">'en',</span> <span class="pre">'pt'],</span> <span class="pre">modify_languages=['es'])</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/dataframe_utils.html#reformat_payload"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#dataframe_utils.reformat_payload" title="Link to this definition"></a></dt>
+<dd><p>Reformats payload arguments based on the expected validation model and store configuration.</p>
+<p>Specifically handles i18n fields by calling <cite>parse_i18n</cite> and aggregates
+“option_value_X” fields into a “values” list for the <cite>Variant</cite> model.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>payload_arguments</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – The dictionary of arguments extracted
+from a data row, intended as payload. This dictionary might be modified.</p></li>
+<li><p><strong>keys_to_reformat</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>]</em>) – A list of keys within <cite>payload_arguments</cite>
+that potentially need reformatting based on the <cite>validation_model</cite>.</p></li>
+<li><p><strong>validation_model</strong> (<em>Type</em><em>[</em><a class="reference internal" href="schemas/validation_schemas.html#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><em>ValidationModel</em></a><em>]</em>) – The Pydantic model used to
+validate and determine the structure of the payload.</p></li>
+<li><p><strong>store_config</strong> (<a class="reference internal" href="schemas/config_schemas.html#schemas.config_schemas.StoreConfig" title="schemas.config_schemas.StoreConfig"><em>StoreConfig</em></a><em>, </em><em>optional</em>) – The store configuration, primarily
+for language settings. Defaults to DEFAULT_CONFIG.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>The potentially modified <cite>payload_arguments</cite> dictionary</dt><dd><p>with fields reformatted according to the model and configuration.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)">str</a>, Any]</p>
+</dd>
+<dt class="field-even">Muestra<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(en Python versión 3.13)"><strong>ValueError</strong></a> – If the payload contains both a “values” key and
+    “option_value_X” keys when the validation model is <cite>Variant</cite>.</p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="dataframe_manager.html" class="btn btn-neutral float-left" title="Gestor de DataFrames (dataframe_manager)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="request_manager.html" class="btn btn-neutral float-right" title="Gestor de Peticiones (request_manager)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

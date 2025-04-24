@@ -1,0 +1,726 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>request_manager &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">request_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para request_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Manages asynchronous API requests, handling authentication, rate limiting,</span>
+<span class="sd">concurrency, and pagination for Tiendanube API interactions.</span>
+
+<span class="sd">Provides the `RequestManager` class to encapsulate API communication logic.</span>
+<span class="sd">It uses `httpx` for asynchronous requests, `asyncio` for concurrency control</span>
+<span class="sd">(Semaphore), and integrates with rate limit schemas and request schemas defined</span>
+<span class="sd">elsewhere. It also utilizes logging configured in `log_db`.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rate_limit_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">RateLimit</span><span class="p">,</span> <span class="n">OldLimit</span><span class="p">,</span> <span class="n">BoostLimit</span><span class="p">,</span> <span class="n">StorefrontLimit</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">requests</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">r</span> <span class="c1"># Used only for initial rate limit check, consider replacing with httpx if possible</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">schemas.request_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">httpx</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">asyncio</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">List</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">log_db</span><span class="w"> </span><span class="kn">import</span> <span class="n">stdout_logger</span><span class="p">,</span> <span class="n">db_logger</span><span class="p">,</span> <span class="n">db_only_logger</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">rich.progress</span><span class="w"> </span><span class="kn">import</span> <span class="n">track</span> <span class="c1"># For visual progress tracking</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataframe_manager</span><span class="w"> </span><span class="kn">import</span> <span class="n">DataframeManager</span> <span class="c1"># Used in multipage execution</span>
+
+<div class="viewcode-block" id="RequestManager">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles asynchronous execution of API requests against the Tiendanube API.</span>
+
+<span class="sd">    Manages authentication headers, determines and respects API rate limits,</span>
+<span class="sd">    controls request concurrency using an asyncio Semaphore, executes single</span>
+<span class="sd">    and multiple requests, and handles multi-page GET requests automatically.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _id (str): A unique identifier for the RequestManager instance.</span>
+<span class="sd">        _api_base_url (str): The base URL for the Tiendanube API.</span>
+<span class="sd">        _user_agent (str): The User-Agent string sent with requests.</span>
+<span class="sd">        _success_status_codes (set): HTTP status codes considered successful.</span>
+<span class="sd">        _rate_limit_status_code (int): HTTP status code indicating rate limiting.</span>
+<span class="sd">        _store_id (str): The ID of the target Tiendanube store.</span>
+<span class="sd">        _auth_token (str): The authentication token (prefixed with &#39;bearer &#39;).</span>
+<span class="sd">        _headers (dict): Pre-built dictionary of request headers.</span>
+<span class="sd">        _composite_url (str): The base URL combined with the store ID.</span>
+<span class="sd">        _rate_limit (RateLimit): The determined rate limit profile for the store.</span>
+<span class="sd">        _concurrecy_semaphore (asyncio.Semaphore): Semaphore to limit concurrent requests.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="RequestManager.__init__">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.__init__">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">store_id</span><span class="p">:</span><span class="nb">str</span><span class="p">,</span> <span class="n">auth_token</span><span class="p">:</span><span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the RequestManager.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            store_id (str): The target Tiendanube store ID.</span>
+<span class="sd">            auth_token (str): The raw authentication token (without &#39;bearer &#39;).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If fetching the initial rate limit fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="nb">str</span><span class="p">(</span><span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">())</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_api_base_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;https://api.tiendanube.com/v1&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;tech-support@tiendanube.com&quot;</span> <span class="c1"># Consider making this configurable</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_success_status_codes</span><span class="p">:</span> <span class="nb">set</span> <span class="o">=</span> <span class="p">{</span><span class="mi">200</span><span class="p">,</span> <span class="mi">201</span><span class="p">,</span> <span class="mi">204</span><span class="p">}</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rate_limit_status_code</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">429</span>
+
+        <span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="n">store_id</span>
+        <span class="c1"># Ensure &#39;bearer &#39; prefix is added to the token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_token</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;bearer </span><span class="si">{</span><span class="n">auth_token</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">auth_token</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bearer &#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">auth_token</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_headers</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_composite_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_api_base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="c1"># Fetch and store the rate limit profile for this store</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_rate_limit</span><span class="p">:</span> <span class="n">RateLimit</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">fetch_store_rate_limit</span><span class="p">()</span>
+        <span class="c1"># Initialize semaphore based on the fetched rate limit</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_concurrecy_semaphore</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">max_concurrent_requests</span><span class="p">)</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;RequestManager initialized under id </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="si">}</span><span class="s2"> with store_id: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;str: The unique identifier for this RequestManager instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;str: The Tiendanube store ID being managed.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span>
+
+    <span class="nd">@store_id</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">store_id</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the store ID and updates related attributes.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;store_id must be a string&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span> <span class="o">=</span> <span class="n">value</span>
+        <span class="c1"># Rebuild composite URL and potentially re-fetch rate limit if store changes</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_composite_url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_api_base_url</span><span class="si">}</span><span class="s2">/</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_store_id</span><span class="si">}</span><span class="s2">&quot;</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Store ID changed to </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s2">. Consider re-fetching rate limit if necessary.&quot;</span><span class="p">)</span>
+        <span class="c1"># self._rate_limit = self.fetch_store_rate_limit() # Uncomment if rate limit should auto-update</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_token</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;str: The authentication token (including &#39;bearer &#39; prefix).&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_token</span>
+
+    <span class="nd">@auth_token</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">auth_token</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Sets the authentication token and rebuilds headers.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;auth_token must be a string&quot;</span><span class="p">)</span>
+        <span class="c1"># Ensure &#39;bearer &#39; prefix is added if missing</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_auth_token</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;bearer </span><span class="si">{</span><span class="n">value</span><span class="si">}</span><span class="s1">&#39;</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">value</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s1">&#39;bearer &#39;</span><span class="p">)</span> <span class="k">else</span> <span class="n">value</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">build_headers</span><span class="p">()</span> <span class="c1"># Rebuild headers with new token</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;Auth token updated.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">rate_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimit</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;RateLimit: The rate limit profile currently applied.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rate_limit</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">concurrency_semaphore</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Semaphore</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;asyncio.Semaphore: The semaphore controlling request concurrency.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_concurrecy_semaphore</span>
+
+<div class="viewcode-block" id="RequestManager.build_headers">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.build_headers">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">build_headers</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Constructs the standard request headers dictionary.</span>
+
+<span class="sd">        Includes Authentication, Content-Type, and User-Agent.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Dict[str, str]: The dictionary of HTTP headers.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="p">{</span>
+            <span class="s1">&#39;Authentication&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_auth_token</span><span class="p">,</span>
+            <span class="s1">&#39;Content-Type&#39;</span><span class="p">:</span> <span class="s1">&#39;application/json&#39;</span><span class="p">,</span>
+            <span class="s1">&#39;User-Agent&#39;</span><span class="p">:</span> <span class="bp">self</span><span class="o">.</span><span class="n">_user_agent</span>
+        <span class="p">}</span>
+        <span class="k">return</span> <span class="n">headers</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.fetch_store_rate_limit">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.fetch_store_rate_limit">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">fetch_store_rate_limit</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RateLimit</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Determines the API rate limit profile for the configured store.</span>
+
+<span class="sd">        Sends a single GET request to a common endpoint (e.g., products) and</span>
+<span class="sd">        inspects the &#39;x-rate-limit-limit&#39; header in the response to identify</span>
+<span class="sd">        the applicable rate limit (Old, Storefront, Boost, or default).</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RateLimit: An instance of the appropriate RateLimit subclass.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            Exception: If the initial request to determine the rate limit fails</span>
+<span class="sd">                       (e.g., invalid credentials, network error).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Fetching rate limit for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="c1"># Use a simple, common endpoint for the check</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_url</span><span class="si">}</span><span class="s2">/products?page=1&amp;per_page=1&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Using synchronous requests here for simplicity during initialization.</span>
+            <span class="c1"># Could be converted to async httpx if preferred.</span>
+            <span class="n">request_data</span> <span class="o">=</span> <span class="n">r</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">_headers</span><span class="p">)</span>
+            <span class="n">request_data</span><span class="o">.</span><span class="n">raise_for_status</span><span class="p">()</span> <span class="c1"># Raise HTTPError for bad responses (4xx or 5xx)</span>
+
+            <span class="n">limit_header</span> <span class="o">=</span> <span class="n">request_data</span><span class="o">.</span><span class="n">headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;x-rate-limit-limit&#39;</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">limit_header</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not find &#39;x-rate-limit-limit&#39; header for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">. Using default RateLimit.&quot;</span><span class="p">)</span>
+                 <span class="k">return</span> <span class="n">RateLimit</span><span class="p">()</span>
+
+            <span class="n">limit_value</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">limit_header</span><span class="p">)</span>
+            <span class="c1"># Match the limit value to the known profiles</span>
+            <span class="k">match</span> <span class="n">limit_value</span><span class="p">:</span>
+                <span class="k">case</span> <span class="mi">500</span><span class="p">:</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting OldLimit for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">OldLimit</span><span class="p">()</span>
+                <span class="k">case</span> <span class="mi">1000</span><span class="p">:</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting StorefrontLimit for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">StorefrontLimit</span><span class="p">()</span>
+                <span class="k">case</span> <span class="mi">400</span><span class="p">:</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Setting BoostLimit for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">BoostLimit</span><span class="p">()</span>
+                <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                    <span class="c1"># Fallback to default if the limit doesn&#39;t match known profiles</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unknown rate limit value (</span><span class="si">{</span><span class="n">limit_value</span><span class="si">}</span><span class="s2">). Setting Standard limit for store </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">RateLimit</span><span class="p">()</span>
+
+        <span class="k">except</span> <span class="n">r</span><span class="o">.</span><span class="n">exceptions</span><span class="o">.</span><span class="n">RequestException</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">request_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span> <span class="n">request_method</span><span class="o">=</span><span class="s1">&#39;GET&#39;</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching rate limit: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">Exception</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error fetching rate limit: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">except</span> <span class="ne">ValueError</span><span class="p">:</span>
+             <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not parse &#39;x-rate-limit-limit&#39; header value: &#39;</span><span class="si">{</span><span class="n">limit_header</span><span class="si">}</span><span class="s2">&#39;. Using default RateLimit.&quot;</span><span class="p">)</span>
+             <span class="k">return</span> <span class="n">RateLimit</span><span class="p">()</span></div>
+
+
+
+<div class="viewcode-block" id="RequestManager.prepare_request_data">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.prepare_request_data">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_request_data</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RequestData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares a `RequestData` object from a `Request` schema object.</span>
+
+<span class="sd">        Constructs the full URL, retrieves headers, and extracts the payload</span>
+<span class="sd">        if applicable for the request type.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_data (Request): The input request schema object containing</span>
+<span class="sd">                                    endpoint details, method, and potentially payload/params.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RequestData: A data object ready for execution by `httpx`, containing</span>
+<span class="sd">                         URL, headers, method, and payload.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Construct the full URL using the base and the endpoint-specific path</span>
+        <span class="n">url</span> <span class="o">=</span> <span class="sa">f</span><span class="s1">&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_composite_url</span><span class="si">}{</span><span class="n">request_data</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s1">&#39;</span>
+        <span class="n">headers</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_headers</span> <span class="c1"># Use pre-built headers</span>
+        <span class="c1"># Extract payload only if the request type expects one (e.g., POST, PUT)</span>
+        <span class="n">payload</span> <span class="o">=</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">if</span> <span class="nb">hasattr</span><span class="p">(</span><span class="n">request_data</span><span class="p">,</span> <span class="s1">&#39;payload&#39;</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+
+        <span class="c1"># Log the preparation step (debug level)</span>
+        <span class="n">db_only_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+            <span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+            <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span>
+            <span class="n">request_url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">request_method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">payload</span> <span class="k">if</span> <span class="n">payload</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+        <span class="p">)</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing request data for </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> </span><span class="si">{</span><span class="n">url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="n">RequestData</span><span class="p">(</span>
+            <span class="n">url</span><span class="o">=</span><span class="n">url</span><span class="p">,</span>
+            <span class="n">headers</span><span class="o">=</span><span class="n">headers</span><span class="p">,</span>
+            <span class="n">method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+            <span class="n">payload</span><span class="o">=</span><span class="n">payload</span>
+        <span class="p">)</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.request_execution">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.request_execution">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">request_execution</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">client</span><span class="p">:</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">,</span> <span class="n">request_data</span><span class="p">:</span> <span class="n">RequestData</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RequestData</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a single prepared HTTP request using the provided httpx client.</span>
+
+<span class="sd">        Handles different HTTP methods (GET, POST, PUT, DELETE) and logs the outcome.</span>
+<span class="sd">        Updates the `response` attribute of the input `request_data` object.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            client (httpx.AsyncClient): The asynchronous HTTP client instance.</span>
+<span class="sd">            request_data (RequestData): The prepared request data object containing</span>
+<span class="sd">                                        URL, headers, method, and payload.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RequestData: The input `request_data` object, updated with the `response`</span>
+<span class="sd">                         attribute (an `httpx.Response` object) or None in case of</span>
+<span class="sd">                         critical failure during execution setup. Logs errors internally.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">response</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># Execute request based on the method specified in RequestData</span>
+            <span class="k">match</span> <span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">:</span>
+                <span class="k">case</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">request_timeout</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s1">&#39;POST&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">post</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">request_timeout</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s1">&#39;PUT&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">put</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">json</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">payload</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">request_timeout</span><span class="p">)</span>
+                <span class="k">case</span> <span class="s1">&#39;DELETE&#39;</span><span class="p">:</span>
+                    <span class="n">response</span> <span class="o">=</span> <span class="k">await</span> <span class="n">client</span><span class="o">.</span><span class="n">delete</span><span class="p">(</span><span class="n">url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">headers</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">headers</span><span class="p">,</span> <span class="n">timeout</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">request_timeout</span><span class="p">)</span>
+                <span class="k">case</span><span class="w"> </span><span class="k">_</span><span class="p">:</span>
+                    <span class="c1"># This should ideally not happen if RequestData is created correctly</span>
+                    <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span> <span class="n">request_url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unsupported HTTP method: </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                    <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s1">&#39;Unsupported HTTP method: </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s1">&#39;</span><span class="p">)</span>
+
+            <span class="n">request_data</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="n">response</span> <span class="c1"># Store the response in the RequestData object</span>
+
+            <span class="c1"># --- Logging based on response status ---</span>
+            <span class="n">status_code</span> <span class="o">=</span> <span class="n">request_data</span><span class="o">.</span><span class="n">response_status</span> <span class="c1"># Use property for convenience</span>
+
+            <span class="k">if</span> <span class="n">status_code</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_success_status_codes</span><span class="p">:</span>
+                <span class="n">log_payload</span> <span class="o">=</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span>
+                <span class="n">log_binding</span> <span class="o">=</span> <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                    <span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span>
+                    <span class="n">request_url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">request_method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                    <span class="n">payload</span><span class="o">=</span><span class="n">log_payload</span><span class="p">,</span> <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span>
+                <span class="p">)</span>
+                <span class="k">if</span> <span class="n">status_code</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">_rate_limit_status_code</span><span class="p">:</span>
+                    <span class="c1"># Specific warning for rate limit errors</span>
+                    <span class="n">log_binding</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Rate limit exceeded&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># General error for other non-success codes</span>
+                    <span class="c1"># Include response text for better debugging</span>
+                    <span class="n">log_binding</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">response</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">response_text</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Request failed&quot;</span><span class="p">)</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># Log successful requests (adjust level based on method)</span>
+                <span class="n">log_level</span> <span class="o">=</span> <span class="s2">&quot;debug&quot;</span> <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">method</span> <span class="o">==</span> <span class="s1">&#39;GET&#39;</span> <span class="k">else</span> <span class="s2">&quot;info&quot;</span>
+                <span class="n">db_only_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                    <span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span>
+                    <span class="n">request_url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">request_method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                    <span class="n">payload</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span>
+                    <span class="n">status_code</span><span class="o">=</span><span class="n">status_code</span>
+                <span class="p">)</span><span class="o">.</span><span class="n">log</span><span class="p">(</span><span class="n">log_level</span><span class="o">.</span><span class="n">upper</span><span class="p">(),</span> <span class="sa">f</span><span class="s2">&quot;Request processed successfully&quot;</span><span class="p">)</span>
+
+            <span class="k">return</span> <span class="n">request_data</span>
+
+        <span class="k">except</span> <span class="n">httpx</span><span class="o">.</span><span class="n">RequestError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Handle client-side request errors (network issues, DNS errors, etc.)</span>
+            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                <span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span>
+                <span class="n">request_url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">request_method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">payload</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;HTTPX RequestError during request execution: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">request_data</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Indicate failure</span>
+            <span class="k">return</span> <span class="n">request_data</span> <span class="c1"># Return the object even on failure for tracking</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Catch any other unexpected errors during execution</span>
+            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span>
+                <span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">store_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">store_id</span><span class="p">,</span>
+                <span class="n">request_url</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">url</span><span class="p">,</span> <span class="n">request_method</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="p">,</span>
+                <span class="n">payload</span><span class="o">=</span><span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">payload</span> <span class="k">else</span> <span class="s1">&#39;&#39;</span><span class="p">,</span> <span class="n">error</span><span class="o">=</span><span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+            <span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Unexpected error during request execution: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">request_data</span><span class="o">.</span><span class="n">response</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Indicate failure</span>
+            <span class="k">return</span> <span class="n">request_data</span> <span class="c1"># Return the object even on failure</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.execute_request">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.execute_request">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">RequestData</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a single API request.</span>
+
+<span class="sd">        Prepares the request data, creates an `httpx` client, executes the request,</span>
+<span class="sd">        and returns the result.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_data (Request): The request schema object defining the request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            RequestData | None: The `RequestData` object containing the response,</span>
+<span class="sd">                                or None if preparation failed critically.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing single request </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">prepared_request</span><span class="p">:</span> <span class="n">RequestData</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request_data</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span>
+            <span class="c1"># Use a context manager for the client to ensure proper cleanup</span>
+            <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">http2</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span> <span class="c1"># Enable HTTP/2 if supported by server</span>
+                <span class="n">response_data</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">request_execution</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">prepared_request</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Finished single request </span><span class="si">{</span><span class="n">response_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2"> for </span><span class="si">{</span><span class="n">response_data</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> with status </span><span class="si">{</span><span class="n">response_data</span><span class="o">.</span><span class="n">response_status</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">response_data</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to execute single request for </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span> <span class="c1"># Indicate failure</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.execute_requests">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.execute_requests">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">execute_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a list of prepared requests concurrently, respecting rate limits.</span>
+
+<span class="sd">        Manages concurrency using the semaphore and implements delays between</span>
+<span class="sd">        requests during the sustained phase based on the calculated rate limit.</span>
+<span class="sd">        Uses `rich.progress.track` for visual feedback.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_data_list (List[RequestData]): A list of prepared `RequestData` objects.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[RequestData]: A list containing the `RequestData` objects, each</span>
+<span class="sd">                               updated with its corresponding `httpx.Response` (or None if failed).</span>
+<span class="sd">                               The order matches the input list.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">tasks</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">requests_sent_count</span> <span class="o">=</span> <span class="mi">0</span>
+        <span class="c1"># Use monotonic clock for reliable time difference calculation</span>
+        <span class="n">last_sustained_request_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+        <span class="n">total_requests</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">request_data_list</span><span class="p">)</span>
+
+        <span class="c1"># Callback function to release semaphore when a task completes (success or failure)</span>
+        <span class="k">def</span><span class="w"> </span><span class="nf">release_semaphore</span><span class="p">(</span><span class="n">task</span><span class="p">:</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">Task</span><span class="p">):</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Releases the semaphore regardless of task outcome.&quot;&quot;&quot;</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Optional: Log task result/exception here if needed</span>
+                <span class="c1"># task.result() or task.exception()</span>
+                <span class="k">pass</span>
+            <span class="k">finally</span><span class="p">:</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">concurrency_semaphore</span><span class="o">.</span><span class="n">release</span><span class="p">()</span>
+                <span class="c1"># stdout_logger.debug(f&quot;Semaphore released by task {task.get_name()}. Current value: {self.concurrency_semaphore._value}&quot;)</span>
+
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing </span><span class="si">{</span><span class="n">total_requests</span><span class="si">}</span><span class="s2"> requests.&quot;</span><span class="p">)</span>
+        <span class="c1"># Estimate runtime (rough calculation, doesn&#39;t account for actual request times)</span>
+        <span class="n">burst_duration</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">burst_limit</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">delay_between_requests</span>
+        <span class="n">sustained_requests</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">total_requests</span> <span class="o">-</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">burst_limit</span><span class="p">)</span>
+        <span class="n">sustained_duration</span> <span class="o">=</span> <span class="n">sustained_requests</span> <span class="o">*</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">delay_between_requests</span>
+        <span class="c1"># This estimated runtime is very approximate</span>
+        <span class="c1"># expected_runtime = burst_duration + sustained_duration</span>
+        <span class="c1"># stdout_logger.info(f&quot;Estimated minimum execution time: {expected_runtime:.2f} seconds (approx).&quot;)</span>
+
+        <span class="k">async</span> <span class="k">with</span> <span class="n">httpx</span><span class="o">.</span><span class="n">AsyncClient</span><span class="p">(</span><span class="n">http2</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span> <span class="k">as</span> <span class="n">client</span><span class="p">:</span>
+            <span class="c1"># Use rich.progress for a progress bar</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">req_data</span> <span class="ow">in</span> <span class="n">track</span><span class="p">(</span><span class="nb">enumerate</span><span class="p">(</span><span class="n">request_data_list</span><span class="p">),</span> <span class="n">total</span><span class="o">=</span><span class="n">total_requests</span><span class="p">,</span> <span class="n">description</span><span class="o">=</span><span class="s2">&quot;Executing requests...&quot;</span><span class="p">):</span>
+
+                <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting Burst Phase (up to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">burst_limit</span><span class="si">}</span><span class="s2"> requests).&quot;</span><span class="p">)</span>
+
+                <span class="c1"># Acquire semaphore before starting request processing</span>
+                <span class="c1"># stdout_logger.debug(f&quot;Attempting to acquire semaphore for request {i+1}. Current value: {self.concurrency_semaphore._value}&quot;)</span>
+                <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">concurrency_semaphore</span><span class="o">.</span><span class="n">acquire</span><span class="p">()</span>
+                <span class="c1"># stdout_logger.debug(f&quot;Semaphore acquired for request {i+1}. Current value: {self.concurrency_semaphore._value}&quot;)</span>
+                <span class="n">requests_sent_count</span> <span class="o">+=</span> <span class="mi">1</span>
+                <span class="n">current_time_before_potential_sleep</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+
+                <span class="c1"># --- Rate Limiting Logic ---</span>
+                <span class="c1"># Apply delay only after the burst limit is exceeded</span>
+                <span class="k">if</span> <span class="n">requests_sent_count</span> <span class="o">&gt;</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">burst_limit</span><span class="p">:</span>
+                    <span class="k">if</span> <span class="n">requests_sent_count</span> <span class="o">==</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">burst_limit</span> <span class="o">+</span> <span class="mi">1</span><span class="p">:</span>
+                        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Burst Phase finished. Starting Sustained Phase (delay: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">delay_between_requests</span><span class="si">:</span><span class="s2">.4f</span><span class="si">}</span><span class="s2">s).&quot;</span><span class="p">)</span>
+
+                    <span class="c1"># Calculate time elapsed since the last sustained request *started*</span>
+                    <span class="n">time_since_last_start</span> <span class="o">=</span> <span class="n">current_time_before_potential_sleep</span> <span class="o">-</span> <span class="n">last_sustained_request_start_time</span>
+                    <span class="c1"># Calculate required sleep duration to maintain the sustained rate</span>
+                    <span class="n">sleep_duration</span> <span class="o">=</span> <span class="nb">max</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">rate_limit</span><span class="o">.</span><span class="n">delay_between_requests</span> <span class="o">-</span> <span class="n">time_since_last_start</span><span class="p">)</span>
+
+                    <span class="k">if</span> <span class="n">sleep_duration</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="c1"># stdout_logger.debug(f&quot;Rate limit: Sleeping for {sleep_duration:.4f}s before request {requests_sent_count}&quot;)</span>
+                        <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="n">sleep_duration</span><span class="p">)</span>
+                    <span class="c1"># Record the start time of this sustained request *after* any potential sleep</span>
+                    <span class="n">last_sustained_request_start_time</span> <span class="o">=</span> <span class="n">time</span><span class="o">.</span><span class="n">monotonic</span><span class="p">()</span>
+                <span class="c1"># --- End Rate Limiting Logic ---</span>
+
+                <span class="c1"># Create and schedule the request execution task</span>
+                <span class="n">task</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">create_task</span><span class="p">(</span>
+                    <span class="bp">self</span><span class="o">.</span><span class="n">request_execution</span><span class="p">(</span><span class="n">client</span><span class="p">,</span> <span class="n">req_data</span><span class="p">),</span>
+                    <span class="n">name</span><span class="o">=</span><span class="sa">f</span><span class="s2">&quot;Req-</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">req_data</span><span class="o">.</span><span class="n">method</span><span class="si">}</span><span class="s2">-</span><span class="si">{</span><span class="n">req_data</span><span class="o">.</span><span class="n">url</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s1">&#39;/&#39;</span><span class="p">)[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="si">}</span><span class="s2">&quot;</span> <span class="c1"># Shortened name</span>
+                <span class="p">)</span>
+                <span class="c1"># Add the callback to release the semaphore when done</span>
+                <span class="n">task</span><span class="o">.</span><span class="n">add_done_callback</span><span class="p">(</span><span class="n">release_semaphore</span><span class="p">)</span>
+                <span class="n">tasks</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">task</span><span class="p">)</span>
+
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;All </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">tasks</span><span class="p">)</span><span class="si">}</span><span class="s2"> request tasks created. Waiting for completion...&quot;</span><span class="p">)</span>
+            <span class="c1"># Wait for all scheduled tasks to complete</span>
+            <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">gather</span><span class="p">(</span><span class="o">*</span><span class="n">tasks</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="s2">&quot;All request tasks have completed.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># --- Process Results ---</span>
+        <span class="n">successful_requests</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="n">res</span> <span class="ow">and</span> <span class="n">res</span><span class="o">.</span><span class="n">response_status</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_success_status_codes</span><span class="p">]</span>
+        <span class="n">failed_requests</span> <span class="o">=</span> <span class="p">[</span><span class="n">res</span> <span class="k">for</span> <span class="n">res</span> <span class="ow">in</span> <span class="n">results</span> <span class="k">if</span> <span class="ow">not</span> <span class="n">res</span> <span class="ow">or</span> <span class="n">res</span><span class="o">.</span><span class="n">response_status</span> <span class="ow">not</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_success_status_codes</span><span class="p">]</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successful requests: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">successful_requests</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">failed_requests</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed requests: </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">failed_requests</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="c1"># Optionally log details of failed requests here</span>
+            <span class="c1"># for failed_req in failed_requests:</span>
+            <span class="c1">#     status = failed_req.response_status if failed_req else &#39;N/A&#39;</span>
+            <span class="c1">#     url = failed_req.url if failed_req else &#39;N/A&#39;</span>
+            <span class="c1">#     stdout_logger.debug(f&quot;  Failed: {url} - Status: {status}&quot;)</span>
+
+        <span class="k">return</span> <span class="n">results</span> <span class="c1"># Return the list of RequestData objects with responses</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.prepare_requests">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.prepare_requests">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">prepare_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Request</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Prepares a list of `Request` schema objects into `RequestData` objects.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_list (List[Request]): A list of request schema objects.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[RequestData]: A list of prepared `RequestData` objects ready for execution.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing format for </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">request_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> requests.&quot;</span><span class="p">)</span>
+        <span class="c1"># Use asyncio.gather for concurrent preparation if prepare_request_data involves I/O</span>
+        <span class="c1"># (Currently it doesn&#39;t, so list comprehension is fine)</span>
+        <span class="c1"># tasks = [self.prepare_request_data(req) for req in request_list]</span>
+        <span class="c1"># return await asyncio.gather(*tasks)</span>
+        <span class="k">return</span> <span class="p">[</span><span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_request_data</span><span class="p">(</span><span class="n">request_data</span><span class="p">)</span> <span class="k">for</span> <span class="n">request_data</span> <span class="ow">in</span> <span class="n">request_list</span><span class="p">]</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.mass_execute_requests">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.mass_execute_requests">[documentos]</a>
+    <span class="k">async</span> <span class="k">def</span><span class="w"> </span><span class="nf">mass_execute_requests</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">requests_dataframe</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Orchestrates the execution of multiple requests defined in a DataFrame.</span>
+
+<span class="sd">        Extracts `Request` objects from the &#39;request&#39; column of the DataFrame,</span>
+<span class="sd">        prepares them, and then executes them concurrently using `execute_requests`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            requests_dataframe (pd.DataFrame): A DataFrame containing a column named</span>
+<span class="sd">                                               &#39;request&#39; where each cell holds a</span>
+<span class="sd">                                               `Request` schema object.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[RequestData]: A list of `RequestData` objects containing the</span>
+<span class="sd">                               results of the executed requests.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Starting mass request execution...&quot;</span><span class="p">)</span>
+        <span class="k">if</span> <span class="s1">&#39;request&#39;</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">requests_dataframe</span><span class="o">.</span><span class="n">columns</span><span class="p">:</span>
+             <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;DataFrame missing &#39;request&#39; column for mass execution.&quot;</span><span class="p">)</span>
+             <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataFrame must contain a &#39;request&#39; column.&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Filter out any potential None values in the &#39;request&#39; column</span>
+        <span class="n">requests</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">Request</span><span class="p">]</span> <span class="o">=</span> <span class="n">requests_dataframe</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">dropna</span><span class="p">()</span><span class="o">.</span><span class="n">tolist</span><span class="p">()</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">requests</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No valid requests found in the DataFrame&#39;s &#39;request&#39; column.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[]</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">requests</span><span class="p">)</span><span class="si">}</span><span class="s2"> requests from DataFrame...&quot;</span><span class="p">)</span>
+        <span class="n">request_data_list</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">]</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">prepare_requests</span><span class="p">(</span><span class="n">requests</span><span class="p">)</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Preparation finished. Executing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">request_data_list</span><span class="p">)</span><span class="si">}</span><span class="s2"> requests...&quot;</span><span class="p">)</span>
+        <span class="n">results</span> <span class="o">=</span> <span class="k">await</span> <span class="bp">self</span><span class="o">.</span><span class="n">execute_requests</span><span class="p">(</span><span class="n">request_data_list</span><span class="p">)</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Mass execution finished. Returning </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="n">results</span><span class="p">)</span><span class="si">}</span><span class="s2"> results.&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">results</span></div>
+
+
+<div class="viewcode-block" id="RequestManager.execute_multipage_request">
+<a class="viewcode-back" href="../request_manager.html#request_manager.RequestManager.execute_multipage_request">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">execute_multipage_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_data</span><span class="p">:</span> <span class="n">Request</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">List</span><span class="p">[</span><span class="n">RequestData</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Executes a GET request and handles pagination to retrieve all results.</span>
+
+<span class="sd">        Performs an initial request. If the response headers indicate multiple</span>
+<span class="sd">        pages (via the &#39;Link&#39; header), it generates requests for the remaining</span>
+<span class="sd">        pages and executes them using `mass_execute_requests`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_data (Request): The initial GET request schema object.</span>
+<span class="sd">                                    Must be a GET request.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            List[RequestData]: A list containing the `RequestData` objects for</span>
+<span class="sd">                               all pages, including the initial request. Returns</span>
+<span class="sd">                               only the first request&#39;s result if pagination is</span>
+<span class="sd">                               not applicable or fails.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the input `request_data` is not a GET request.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">request_data</span><span class="o">.</span><span class="n">method</span> <span class="o">!=</span> <span class="s1">&#39;GET&#39;</span><span class="p">:</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;execute_multipage_request only supports GET requests.&quot;</span><span class="p">)</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">extract_last_page</span><span class="p">(</span><span class="n">link_header</span><span class="p">:</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">int</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Helper to parse the &#39;last&#39; page number from a Link header.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="ow">not</span> <span class="n">link_header</span><span class="p">:</span>
+                <span class="k">return</span> <span class="mi">1</span> <span class="c1"># No header means only one page</span>
+            <span class="c1"># Regex to find &#39;&lt;url&gt;; rel=&quot;last&quot;&#39; and capture the page number</span>
+            <span class="n">pattern</span> <span class="o">=</span> <span class="sa">r</span><span class="s1">&#39;&lt;[^&gt;]*?page=(\d+)[^&gt;]*&gt;;\s*rel=&quot;last&quot;&#39;</span>
+            <span class="n">match</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">search</span><span class="p">(</span><span class="n">pattern</span><span class="p">,</span> <span class="n">link_header</span><span class="p">)</span>
+            <span class="k">if</span> <span class="n">match</span><span class="p">:</span>
+                <span class="k">try</span><span class="p">:</span>
+                    <span class="n">last_page_number</span> <span class="o">=</span> <span class="nb">int</span><span class="p">(</span><span class="n">match</span><span class="o">.</span><span class="n">group</span><span class="p">(</span><span class="mi">1</span><span class="p">))</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Extracted last page number: </span><span class="si">{</span><span class="n">last_page_number</span><span class="si">}</span><span class="s2"> from Link header.&quot;</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="n">last_page_number</span>
+                <span class="k">except</span> <span class="p">(</span><span class="ne">ValueError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">):</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;Found &#39;last&#39; link pattern, but failed to extract page number.&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                    <span class="k">return</span> <span class="mi">1</span> <span class="c1"># Treat as one page on error</span>
+            <span class="k">else</span><span class="p">:</span>
+                <span class="c1"># If &#39;rel=&quot;last&quot;&#39; is not found, assume only one page</span>
+                <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="s2">&quot;No &#39;rel=</span><span class="se">\&quot;</span><span class="s2">last</span><span class="se">\&quot;</span><span class="s2">&#39; found in Link header. Assuming single page.&quot;</span><span class="p">)</span>
+                <span class="k">return</span> <span class="mi">1</span>
+
+        <span class="k">def</span><span class="w"> </span><span class="nf">generate_pages_df</span><span class="p">(</span><span class="n">last_page</span><span class="p">:</span> <span class="nb">int</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">            </span><span class="sd">&quot;&quot;&quot;Helper to create a DataFrame containing &#39;params&#39; for subsequent pages.&quot;&quot;&quot;</span>
+            <span class="k">if</span> <span class="n">last_page</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="p">[]})</span> <span class="c1"># Return empty DataFrame if no extra pages</span>
+            <span class="c1"># Generate params dictionaries for pages 2 through last_page</span>
+            <span class="n">params</span> <span class="o">=</span> <span class="p">[{</span><span class="s1">&#39;page&#39;</span><span class="p">:</span> <span class="n">i</span><span class="p">}</span> <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">2</span><span class="p">,</span> <span class="n">last_page</span> <span class="o">+</span> <span class="mi">1</span><span class="p">)]</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Generated params for pages 2 to </span><span class="si">{</span><span class="n">last_page</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">({</span><span class="s1">&#39;params&#39;</span><span class="p">:</span> <span class="n">params</span><span class="p">})</span>
+
+        <span class="c1"># --- Main Logic ---</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing multi-page request for </span><span class="si">{</span><span class="n">request_data</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Execute the first request synchronously using asyncio.run</span>
+        <span class="c1"># Consider making this method async if called from an async context</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing first page request...&quot;</span><span class="p">)</span>
+        <span class="n">first_request_response</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">execute_request</span><span class="p">(</span><span class="n">request_data</span><span class="p">))</span>
+
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">first_request_response</span> <span class="ow">or</span> <span class="ow">not</span> <span class="n">first_request_response</span><span class="o">.</span><span class="n">response</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;First page request failed. Cannot proceed with pagination.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">first_request_response</span><span class="p">]</span> <span class="k">if</span> <span class="n">first_request_response</span> <span class="k">else</span> <span class="p">[]</span> <span class="c1"># Return failed first attempt</span>
+
+        <span class="c1"># Extract Link header and determine the last page</span>
+        <span class="n">link_header</span> <span class="o">=</span> <span class="n">first_request_response</span><span class="o">.</span><span class="n">response_headers</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s1">&#39;link&#39;</span><span class="p">)</span>
+        <span class="n">last_page</span> <span class="o">=</span> <span class="n">extract_last_page</span><span class="p">(</span><span class="n">link_header</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="n">last_page</span> <span class="o">&lt;=</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Single page result or pagination info not found. Returning first page only.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="p">[</span><span class="n">first_request_response</span><span class="p">]</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Detected </span><span class="si">{</span><span class="n">last_page</span><span class="si">}</span><span class="s2"> pages. Preparing requests for remaining pages...&quot;</span><span class="p">)</span>
+        <span class="c1"># Generate DataFrame for pages 2 to last_page</span>
+        <span class="n">pages_dataframe</span> <span class="o">=</span> <span class="n">generate_pages_df</span><span class="p">(</span><span class="n">last_page</span><span class="p">)</span>
+        <span class="c1"># Use DataframeManager to parse these pages into Request objects</span>
+        <span class="c1"># Need to pass the original endpoint config for context</span>
+        <span class="n">dataframe_manager</span> <span class="o">=</span> <span class="n">DataframeManager</span><span class="p">(</span><span class="n">df</span><span class="o">=</span><span class="n">pages_dataframe</span><span class="p">)</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">dataframe_manager</span><span class="o">.</span><span class="n">parse_requests_into_dataframe</span><span class="p">(</span><span class="n">GetRequest</span><span class="p">,</span> <span class="n">request_data</span><span class="o">.</span><span class="n">endpoint</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+             <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse page requests into DataFrame: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+             <span class="k">return</span> <span class="p">[</span><span class="n">first_request_response</span><span class="p">]</span> <span class="c1"># Return only first page if parsing fails</span>
+
+        <span class="c1"># Execute the requests for the remaining pages</span>
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Executing requests for pages 2 to </span><span class="si">{</span><span class="n">last_page</span><span class="si">}</span><span class="s2">...&quot;</span><span class="p">)</span>
+        <span class="n">remaining_request_responses</span> <span class="o">=</span> <span class="n">asyncio</span><span class="o">.</span><span class="n">run</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">mass_execute_requests</span><span class="p">(</span><span class="n">dataframe_manager</span><span class="o">.</span><span class="n">current_df</span><span class="p">))</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Multi-page execution complete. Combining results.&quot;</span><span class="p">)</span>
+        <span class="c1"># Combine the first page result with the results from subsequent pages</span>
+        <span class="k">return</span> <span class="p">[</span><span class="n">first_request_response</span><span class="p">]</span> <span class="o">+</span> <span class="n">remaining_request_responses</span></div>
+</div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

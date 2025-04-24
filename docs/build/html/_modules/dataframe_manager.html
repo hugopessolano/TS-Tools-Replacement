@@ -1,0 +1,416 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dataframe_manager &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">dataframe_manager</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para dataframe_manager</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Manages pandas DataFrames, particularly for preparing data for API requests.</span>
+
+<span class="sd">This module provides the DataframeManager class, which facilitates reading</span>
+<span class="sd">data from CSV files or using existing DataFrames, converting rows into</span>
+<span class="sd">structured request objects, and handling potential errors during the process.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">schemas.request_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="o">*</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">os</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">schemas.endpoint_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">Endpoint</span><span class="p">,</span> <span class="n">EndpointMap</span><span class="p">,</span> <span class="n">build_endpoint_map</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">dataframe_utils</span><span class="w"> </span><span class="kn">import</span> <span class="n">reformat_payload</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">log_db</span><span class="w"> </span><span class="kn">import</span> <span class="n">stdout_logger</span><span class="p">,</span> <span class="n">db_logger</span><span class="p">,</span> <span class="n">db_only_logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">uuid</span>
+
+<div class="viewcode-block" id="DataframeManager">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DataframeManager</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Handles operations on a pandas DataFrame, primarily focused on converting</span>
+<span class="sd">    rows into API request objects based on endpoint configurations.</span>
+
+<span class="sd">    Can be initialized either by reading a CSV file from the &#39;tmp&#39; directory</span>
+<span class="sd">    relative to the script location or by directly passing a pandas DataFrame.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        _id (uuid.UUID): A unique identifier for the manager instance.</span>
+<span class="sd">        _csv_name (str | None): The name of the CSV file used for initialization, if any.</span>
+<span class="sd">        _script_dir (str): The directory where the script is located.</span>
+<span class="sd">        _file_path (str | None): The full path to the input CSV file, if used.</span>
+<span class="sd">        _export_file_path (str): The full path for exporting data.</span>
+<span class="sd">        _current_df (pd.DataFrame): The pandas DataFrame being managed.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+<div class="viewcode-block" id="DataframeManager.__init__">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager.__init__">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="fm">__init__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">csv_name</span><span class="p">:</span><span class="nb">str</span><span class="o">|</span><span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="o">|</span><span class="kc">None</span><span class="o">=</span><span class="kc">None</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Initializes the DataframeManager.</span>
+
+<span class="sd">        Requires either &#39;csv_name&#39; to read from a file or &#39;df&#39; to use an</span>
+<span class="sd">        existing DataFrame.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            csv_name (str | None, optional): The name of the CSV file located</span>
+<span class="sd">                in the &#39;tmp&#39; subdirectory. Defaults to None.</span>
+<span class="sd">            df (pd.DataFrame | None, optional): An existing pandas DataFrame</span>
+<span class="sd">                to manage. Defaults to None.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If neither &#39;csv_name&#39; nor &#39;df&#39; is provided.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_id</span><span class="p">:</span><span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span> <span class="o">=</span> <span class="n">uuid</span><span class="o">.</span><span class="n">uuid4</span><span class="p">()</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_csv_name</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">csv_name</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_script_dir</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">realpath</span><span class="p">(</span><span class="vm">__file__</span><span class="p">))</span>
+        <span class="c1"># Construct paths relative to the script directory</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_script_dir</span><span class="p">,</span> <span class="s1">&#39;tmp&#39;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_csv_name</span><span class="p">)</span> <span class="k">if</span> <span class="n">csv_name</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_export_file_path</span><span class="p">:</span><span class="nb">str</span> <span class="o">=</span> <span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">join</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_script_dir</span><span class="p">,</span> <span class="s1">&#39;export&#39;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;export_</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_csv_name</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">csv_name</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;file&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">read_csv</span><span class="p">()</span> <span class="k">if</span> <span class="n">csv_name</span> <span class="k">else</span> <span class="n">df</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">critical</span><span class="p">(</span><span class="s2">&quot;DataframeManager requires either a CSV file name or a DataFrame to be initialized.&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;DataframeManager requires either a CSV file name or a DataFrame to be initialized.&quot;</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;DataframeManager initialized with DataFrame size: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">shape</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">id</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">uuid</span><span class="o">.</span><span class="n">UUID</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;uuid.UUID: The unique identifier for this DataframeManager instance.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_id</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">csv_name</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;str | None: The name of the CSV file used, if any.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_csv_name</span>
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_df</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;pd.DataFrame: The currently managed DataFrame.&quot;&quot;&quot;</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span>
+
+    <span class="nd">@current_df</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">current_df</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">df</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the internal DataFrame.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            df (pd.DataFrame): The new DataFrame to manage.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the provided object is not a pandas DataFrame.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">df</span><span class="p">,</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">):</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="s2">&quot;dataframe must be a pandas DataFrame&quot;</span><span class="p">)</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;current_df must be a pandas DataFrame&quot;</span><span class="p">)</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span> <span class="o">=</span> <span class="n">df</span>
+
+<div class="viewcode-block" id="DataframeManager.read_csv">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager.read_csv">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Reads the CSV file specified during initialization.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: The DataFrame read from the CSV file.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            FileNotFoundError: If the CSV file does not exist at the expected path.</span>
+<span class="sd">            Exception: For other potential errors during file reading.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Reading CSV file from: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="n">df</span> <span class="o">=</span> <span class="n">pd</span><span class="o">.</span><span class="n">read_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Successfully read CSV from: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">df</span>
+        <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;CSV File not found at: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error at reading CSV: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">raise</span></div>
+
+
+<div class="viewcode-block" id="DataframeManager.row_to_request">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager.row_to_request">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">row_to_request</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">row</span><span class="p">:</span> <span class="n">pd</span><span class="o">.</span><span class="n">Series</span><span class="p">,</span> <span class="n">request_type</span><span class="p">:</span><span class="nb">type</span><span class="p">[</span><span class="n">Request</span><span class="p">],</span> <span class="n">endpoint</span><span class="p">:</span><span class="n">Endpoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Request</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Converts a single DataFrame row into a specified Request object.</span>
+
+<span class="sd">        Dynamically maps row data to the Request model fields based on the</span>
+<span class="sd">        provided Endpoint configuration. Handles positional URL arguments,</span>
+<span class="sd">        optional &#39;params&#39;, and constructs the &#39;payload&#39;.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            row (pd.Series): The DataFrame row to convert.</span>
+<span class="sd">            request_type (type[Request]): The specific Request class (e.g.,</span>
+<span class="sd">                GetRequest, PostRequest) to instantiate.</span>
+<span class="sd">            endpoint (Endpoint): The Endpoint configuration object containing</span>
+<span class="sd">                details about path, arguments, and validation models.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Request | None: An instance of the specified &#39;request_type&#39; populated</span>
+<span class="sd">            with data from the row, or None if conversion fails.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Converting row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to request of type </span><span class="si">{</span><span class="n">request_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> for endpoint &#39;</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;...&quot;</span><span class="p">)</span>
+            <span class="n">row_copy</span> <span class="o">=</span> <span class="n">row</span><span class="o">.</span><span class="n">copy</span><span class="p">()</span> <span class="c1"># Work on a copy to avoid modifying the original Series</span>
+
+            <span class="c1"># Prepare base content for the request object</span>
+            <span class="n">request_content</span> <span class="o">=</span> <span class="p">{</span>
+                <span class="s1">&#39;endpoint&#39;</span><span class="p">:</span> <span class="n">endpoint</span><span class="p">,</span>
+                <span class="s1">&#39;positional_url_arguments&#39;</span><span class="p">:</span> <span class="nb">list</span><span class="p">(</span><span class="nb">map</span><span class="p">(</span><span class="nb">str</span><span class="p">,</span><span class="n">row_copy</span><span class="o">.</span><span class="n">to_list</span><span class="p">()[:</span><span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="p">]))</span> <span class="k">if</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span> <span class="o">&gt;</span> <span class="mi">0</span> <span class="k">else</span> <span class="kc">None</span>
+                            <span class="p">}</span>
+
+            <span class="c1"># Handle optional &#39;params&#39; if present in the row and expected by the request model</span>
+            <span class="k">if</span> <span class="s1">&#39;params&#39;</span> <span class="ow">in</span> <span class="n">row_copy</span><span class="o">.</span><span class="n">index</span><span class="p">:</span>
+                <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Found &#39;params&#39; column. Processing...&quot;</span><span class="p">)</span>
+                <span class="k">if</span> <span class="s1">&#39;params&#39;</span> <span class="ow">in</span> <span class="n">request_type</span><span class="o">.</span><span class="n">model_fields</span><span class="p">:</span>
+                    <span class="n">params_data</span> <span class="o">=</span> <span class="n">row_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;params&#39;</span><span class="p">)</span>
+                    <span class="c1"># Attempt to parse if &#39;params&#39; data is a JSON string</span>
+                    <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">params_data</span><span class="p">,</span> <span class="nb">str</span><span class="p">):</span>
+                        <span class="k">try</span><span class="p">:</span>
+                            <span class="n">params_data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">params_data</span><span class="p">)</span>
+                        <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row_copy</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Could not parse &#39;params&#39; column as JSON: </span><span class="si">{</span><span class="n">params_data</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                            <span class="n">params_data</span> <span class="o">=</span> <span class="p">{}</span> <span class="c1"># Default to empty dict on parse error</span>
+                    <span class="n">request_content</span><span class="p">[</span><span class="s1">&#39;params&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">params_data</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Log if &#39;params&#39; column exists but is not expected by the model</span>
+                    <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row_copy</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: &#39;params&#39; column not found in </span><span class="si">{</span><span class="n">request_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> model. Ignoring irrelevant data.&quot;</span><span class="p">)</span>
+                    <span class="n">row_copy</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="s1">&#39;params&#39;</span><span class="p">)</span> <span class="c1"># Remove to avoid issues later</span>
+
+            <span class="c1"># Handle &#39;payload&#39; if expected by the request model</span>
+            <span class="k">if</span> <span class="s1">&#39;payload&#39;</span> <span class="ow">in</span> <span class="n">request_type</span><span class="o">.</span><span class="n">model_fields</span><span class="p">:</span>
+                <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Processing payload data...&quot;</span><span class="p">)</span>
+                <span class="n">payload</span> <span class="o">=</span> <span class="p">{}</span>
+                <span class="c1"># Remaining columns after positional args are considered payload arguments</span>
+                <span class="n">payload_arguments</span> <span class="o">=</span> <span class="n">row_copy</span><span class="p">[</span><span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="p">:]</span><span class="o">.</span><span class="n">to_dict</span><span class="p">()</span>
+
+                <span class="c1"># Apply validation/reformatting if a validation model is defined for the endpoint</span>
+                <span class="k">if</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="p">:</span>
+                    <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Found validation model. Processing validations&quot;</span><span class="p">)</span>
+                    <span class="c1"># Identify keys present in both payload_arguments and the validation model</span>
+                    <span class="n">keys_to_reformat</span> <span class="o">=</span> <span class="p">[</span><span class="n">key</span> <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="nb">tuple</span><span class="p">(</span><span class="n">payload_arguments</span><span class="o">.</span><span class="n">keys</span><span class="p">())</span> <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="o">.</span><span class="n">model_fields</span><span class="p">]</span>
+                    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">keys_to_reformat</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Found keys to reformat: </span><span class="si">{</span><span class="n">keys_to_reformat</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                        <span class="c1"># Use utility function to reformat the payload based on the validation model</span>
+                        <span class="n">payload</span> <span class="o">=</span> <span class="n">reformat_payload</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">,</span> <span class="n">keys_to_reformat</span><span class="p">,</span> <span class="n">endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="p">)</span>
+                    <span class="k">else</span><span class="p">:</span>
+                         <span class="c1"># If no keys match the validation model, use the arguments as is</span>
+                        <span class="n">payload</span> <span class="o">=</span> <span class="n">payload_arguments</span>
+                <span class="k">else</span><span class="p">:</span>
+                     <span class="c1"># If no validation model, use the arguments as is</span>
+                    <span class="n">payload</span> <span class="o">=</span> <span class="n">payload_arguments</span>
+
+                <span class="n">request_content</span><span class="p">[</span><span class="s1">&#39;payload&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">payload</span>
+
+            <span class="c1"># Instantiate the request object</span>
+            <span class="n">request</span> <span class="o">=</span> <span class="n">request_type</span><span class="p">(</span><span class="o">**</span><span class="n">request_content</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2">: Successfully converted to </span><span class="si">{</span><span class="n">request_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+            <span class="k">return</span> <span class="n">request</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="c1"># Log any error during conversion and return None</span>
+            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error converting row </span><span class="si">{</span><span class="n">row</span><span class="o">.</span><span class="n">name</span><span class="si">}</span><span class="s2"> to request: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="k">return</span> <span class="kc">None</span></div>
+
+
+<div class="viewcode-block" id="DataframeManager.parse_requests_into_dataframe">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager.parse_requests_into_dataframe">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">parse_requests_into_dataframe</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">request_type</span><span class="p">:</span><span class="nb">type</span><span class="p">[</span><span class="n">Request</span><span class="p">],</span> <span class="n">endpoint</span><span class="p">:</span><span class="n">Endpoint</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Applies `row_to_request` to each row of the internal DataFrame.</span>
+
+<span class="sd">        Adds a new column named &#39;request&#39; to the DataFrame, containing the</span>
+<span class="sd">        generated Request object for each row (or None if conversion failed).</span>
+<span class="sd">        Logs statistics about successful and failed conversions.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            request_type (type[Request]): The specific Request class to use for conversion.</span>
+<span class="sd">            endpoint (Endpoint): The Endpoint configuration for the requests.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            pd.DataFrame: The DataFrame with the added &#39;request&#39; column.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the DataFrame is not empty but no requests could be</span>
+<span class="sd">                        successfully parsed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;DataFrame is empty. No requests to parse.&quot;</span><span class="p">)</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Add empty column for consistency</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parsing </span><span class="si">{</span><span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">)</span><span class="si">}</span><span class="s2"> rows into </span><span class="si">{</span><span class="n">request_type</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2"> objects for endpoint &#39;</span><span class="si">{</span><span class="n">endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&#39;...&quot;</span><span class="p">)</span>
+        <span class="c1"># Apply the conversion function row-wise</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">apply</span><span class="p">(</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">row_to_request</span><span class="p">,</span>
+            <span class="n">axis</span><span class="o">=</span><span class="mi">1</span><span class="p">,</span>
+            <span class="n">args</span><span class="o">=</span><span class="p">(</span><span class="n">request_type</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="n">successful_requests</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">notna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># Check if any requests were parsed if the dataframe wasn&#39;t empty initially</span>
+        <span class="k">if</span> <span class="n">successful_requests</span> <span class="o">==</span> <span class="mi">0</span> <span class="ow">and</span> <span class="ow">not</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">empty</span><span class="p">:</span> <span class="c1"># Check added to avoid error on initially empty df</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="s2">&quot;No requests were successfully parsed. Check the input data and logs.&quot;</span><span class="p">)</span>
+            <span class="c1"># Optionally raise an error if no requests succeed</span>
+            <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="s2">&quot;No requests were successfully parsed. Check the input data.&quot;</span><span class="p">)</span>
+
+        <span class="n">stdout_logger</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Parsed </span><span class="si">{</span><span class="n">successful_requests</span><span class="si">}</span><span class="s2"> requests successfully.&quot;</span><span class="p">)</span>
+        <span class="n">failed_requests</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span><span class="o">.</span><span class="n">sum</span><span class="p">()</span>
+
+        <span class="c1"># Log failed requests count if any</span>
+        <span class="k">if</span> <span class="n">failed_requests</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to parse </span><span class="si">{</span><span class="n">failed_requests</span><span class="si">}</span><span class="s2"> requests.&quot;</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Check logs for errors related to the </span><span class="si">{</span><span class="n">failed_requests</span><span class="si">}</span><span class="s2"> failed request conversions.&quot;</span><span class="p">)</span>
+            <span class="c1"># Attempt to log the data of rows that failed conversion</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">failed_mask</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="p">[</span><span class="s1">&#39;request&#39;</span><span class="p">]</span><span class="o">.</span><span class="n">isna</span><span class="p">()</span>
+                <span class="c1"># Select original data columns for failed rows</span>
+                <span class="n">failed_rows_df</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">failed_mask</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span><span class="o">.</span><span class="n">columns</span> <span class="o">!=</span> <span class="s1">&#39;request&#39;</span><span class="p">]</span>
+                <span class="c1"># Convert to dictionary for easier logging</span>
+                <span class="n">failed_rows_dict_by_index</span> <span class="o">=</span> <span class="n">failed_rows_df</span><span class="o">.</span><span class="n">to_dict</span><span class="p">(</span><span class="n">orient</span><span class="o">=</span><span class="s1">&#39;index&#39;</span><span class="p">)</span>
+                <span class="c1"># Dump to JSON string for structured logging</span>
+                <span class="n">failed_data_log</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">dumps</span><span class="p">(</span><span class="n">failed_rows_dict_by_index</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">,</span> <span class="n">default</span><span class="o">=</span><span class="nb">str</span><span class="p">)</span> <span class="c1"># Use default=str for non-serializable types</span>
+                <span class="n">db_only_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">,</span> <span class="n">data</span><span class="o">=</span><span class="n">failed_data_log</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data of failed rows:&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">log_e</span><span class="p">:</span>
+                <span class="c1"># Log if serializing failed rows causes an error</span>
+                <span class="n">db_logger</span><span class="o">.</span><span class="n">bind</span><span class="p">(</span><span class="n">operation_id</span><span class="o">=</span><span class="bp">self</span><span class="o">.</span><span class="n">id</span><span class="p">)</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Could not serialize failed rows data to JSON: </span><span class="si">{</span><span class="n">log_e</span><span class="si">}</span><span class="s2">.&quot;</span><span class="p">)</span>
+
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_current_df</span></div>
+
+
+<div class="viewcode-block" id="DataframeManager.write_csv">
+<a class="viewcode-back" href="../dataframe_manager.html#dataframe_manager.DataframeManager.write_csv">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">write_csv</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">data</span><span class="p">:</span><span class="n">pd</span><span class="o">.</span><span class="n">DataFrame</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="kc">False</span><span class="p">):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Writes a DataFrame to the CSV file path defined during initialization.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            data (pd.DataFrame): The DataFrame to write.</span>
+<span class="sd">            index (bool, optional): Whether to write the DataFrame index as a</span>
+<span class="sd">                column. Defaults to False.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">try</span><span class="p">:</span>
+            <span class="c1"># Ensure the directory exists before writing</span>
+            <span class="n">os</span><span class="o">.</span><span class="n">makedirs</span><span class="p">(</span><span class="n">os</span><span class="o">.</span><span class="n">path</span><span class="o">.</span><span class="n">dirname</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">),</span> <span class="n">exist_ok</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+            <span class="n">data</span><span class="o">.</span><span class="n">to_csv</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="p">,</span> <span class="n">index</span><span class="o">=</span><span class="n">index</span><span class="p">)</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">info</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Data successfully written to </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">_file_path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+            <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Error writing to CSV file: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span></div>
+</div>
+
+            <span class="c1"># Optionally re-raise the exception if needed</span>
+            <span class="c1"># raise</span>
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+    <span class="c1"># Example usage: Initialize manager, get endpoint, parse requests</span>
+    <span class="k">try</span><span class="p">:</span> <span class="c1"># Added try-except for robustness in example</span>
+        <span class="n">csv_manager</span> <span class="o">=</span> <span class="n">DataframeManager</span><span class="p">(</span><span class="s1">&#39;requests_data.csv&#39;</span><span class="p">)</span>
+        <span class="n">endpoint_map</span><span class="p">:</span><span class="n">EndpointMap</span> <span class="o">=</span> <span class="n">build_endpoint_map</span><span class="p">()</span>
+        <span class="c1"># Example: Using the &#39;single&#39; endpoint under &#39;products&#39;</span>
+        <span class="n">endpoint</span><span class="p">:</span><span class="n">Endpoint</span> <span class="o">=</span> <span class="n">endpoint_map</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">single</span>
+        <span class="c1"># Parse rows into PutRequest objects based on the endpoint config</span>
+        <span class="n">csv_manager</span><span class="o">.</span><span class="n">parse_requests_into_dataframe</span><span class="p">(</span><span class="n">PutRequest</span><span class="p">,</span> <span class="n">endpoint</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;ok&#39;</span><span class="p">)</span> <span class="c1"># Simple confirmation</span>
+    <span class="k">except</span> <span class="ne">FileNotFoundError</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Example skipped: &#39;requests_data.csv&#39; not found in &#39;tmp/&#39; directory.&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;An error occurred during example execution: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

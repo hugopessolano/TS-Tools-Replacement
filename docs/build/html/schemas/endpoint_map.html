@@ -1,0 +1,376 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Mapa de Endpoints (endpoint_map) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Esquemas de Petición (request_schemas)" href="request_schemas.html" />
+    <link rel="prev" title="Configuración de Endpoints (endpoint_config)" href="endpoint_config.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Esquemas (<cite>schemas</cite>)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config_schemas.html">Esquemas de Configuración (<cite>config_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="endpoint_config.html">Configuración de Endpoints (<cite>endpoint_config</cite>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Mapa de Endpoints (<cite>endpoint_map</cite>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.Endpoint"><code class="docutils literal notranslate"><span class="pre">Endpoint</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.Config"><code class="docutils literal notranslate"><span class="pre">Endpoint.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.model_config"><code class="docutils literal notranslate"><span class="pre">Endpoint.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.path"><code class="docutils literal notranslate"><span class="pre">Endpoint.path</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.path_with_positional_args"><code class="docutils literal notranslate"><span class="pre">Endpoint.path_with_positional_args()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.positional_arguments_count"><code class="docutils literal notranslate"><span class="pre">Endpoint.positional_arguments_count</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.Endpoint.validation_model"><code class="docutils literal notranslate"><span class="pre">Endpoint.validation_model</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup"><code class="docutils literal notranslate"><span class="pre">EndpointGroup</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup.Config"><code class="docutils literal notranslate"><span class="pre">EndpointGroup.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup.all"><code class="docutils literal notranslate"><span class="pre">EndpointGroup.all</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup.children"><code class="docutils literal notranslate"><span class="pre">EndpointGroup.children</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup.model_config"><code class="docutils literal notranslate"><span class="pre">EndpointGroup.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup.single"><code class="docutils literal notranslate"><span class="pre">EndpointGroup.single</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.EndpointMap"><code class="docutils literal notranslate"><span class="pre">EndpointMap</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointMap.model_config"><code class="docutils literal notranslate"><span class="pre">EndpointMap.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.endpoint_map.EndpointMap.root"><code class="docutils literal notranslate"><span class="pre">EndpointMap.root</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.build_endpoint_map"><code class="docutils literal notranslate"><span class="pre">build_endpoint_map()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.build_tree_corrected"><code class="docutils literal notranslate"><span class="pre">build_tree_corrected()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.endpoint_map.tree_to_endpoint_group"><code class="docutils literal notranslate"><span class="pre">tree_to_endpoint_group()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="request_schemas.html">Esquemas de Petición (<cite>request_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="validation_schemas.html">Esquemas de Validación (<cite>validation_schemas</cite>)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Esquemas (<cite>schemas</cite>)</a></li>
+      <li class="breadcrumb-item active">Mapa de Endpoints (<cite>endpoint_map</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/schemas/endpoint_map.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="mapa-de-endpoints-endpoint-map">
+<h1>Mapa de Endpoints (<cite>endpoint_map</cite>)<a class="headerlink" href="#mapa-de-endpoints-endpoint-map" title="Link to this heading"></a></h1>
+<p id="module-schemas.endpoint_map">Defines models and functions to build a structured map of API endpoints.</p>
+<p>This module parses a list of endpoint path strings (from <cite>endpoint_config</cite>)
+and organizes them into a hierarchical structure (<cite>EndpointMap</cite>) using nested
+<cite>EndpointGroup</cite> objects. Each endpoint path is represented by an <cite>Endpoint</cite>
+object, which stores the path, counts positional arguments, and links to an
+optional Pydantic validation model based on naming conventions.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">Endpoint</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#Endpoint"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.Endpoint" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Represents a single API endpoint configuration.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>path</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The raw endpoint path string (e.g., «/products/{arg_1}/variants»).</p></li>
+<li><p><strong>positional_arguments_count</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><em>int</em></a>) – The number of positional arguments
+(placeholders like {arg_n}) found in the path.</p></li>
+<li><p><strong>validation_model</strong> (<em>Optional</em><em>[</em><em>Type</em><em>[</em><a class="reference internal" href="validation_schemas.html#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><em>ValidationModel</em></a><em>]</em><em>]</em>) – The Pydantic model associated
+with this endpoint for request/response
+validation, if applicable. Determined
+based on the endpoint’s resource name.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#Endpoint.Config"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.Endpoint.Config" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.Config.arbitrary_types_allowed">
+<span class="sig-name descname"><span class="pre">arbitrary_types_allowed</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#schemas.endpoint_map.Endpoint.Config.arbitrary_types_allowed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True}</span></em><a class="headerlink" href="#schemas.endpoint_map.Endpoint.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.path">
+<span class="sig-name descname"><span class="pre">path</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.endpoint_map.Endpoint.path" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.path_with_positional_args">
+<span class="sig-name descname"><span class="pre">path_with_positional_args</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#Endpoint.path_with_positional_args"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.Endpoint.path_with_positional_args" title="Link to this definition"></a></dt>
+<dd><p>DEPRECATED/UNUSED? Replaces named placeholders with indexed placeholders.</p>
+<p>Example: «/products/{product_id}/variants» -&gt; «/products/{arg_1}/variants»
+Note: The current implementation seems to use indexed placeholders directly.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Devuelve<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The path string with placeholders potentially renamed.</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)">str</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.positional_arguments_count">
+<span class="sig-name descname"><span class="pre">positional_arguments_count</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a></em><a class="headerlink" href="#schemas.endpoint_map.Endpoint.positional_arguments_count" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.Endpoint.validation_model">
+<span class="sig-name descname"><span class="pre">validation_model</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Type" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Type</span></code></a><span class="pre">[</span><a class="reference internal" href="validation_schemas.html#schemas.validation_schemas.ValidationModel" title="schemas.validation_schemas.ValidationModel"><code class="xref py py-class docutils literal notranslate"><span class="pre">ValidationModel</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.endpoint_map.Endpoint.validation_model" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">EndpointGroup</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#EndpointGroup"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Represents a group of related endpoints, often corresponding to a resource.</p>
+<p>Endpoints are typically categorized as “all” (listing/creating the resource collection)
+or “single” (accessing/modifying a specific resource instance). Nested resources
+are represented by child <cite>EndpointGroup</cite> objects.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>all</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><em>Endpoint</em></a><em>]</em>) – The endpoint for the collection resource
+(e.g., GET /products, POST /products).</p></li>
+<li><p><strong>single</strong> (<em>Optional</em><em>[</em><a class="reference internal" href="#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><em>Endpoint</em></a><em>]</em>) – The endpoint for a single resource instance
+(e.g., GET /products/{id}, PUT /products/{id}).</p></li>
+<li><p><strong>children</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>&quot;EndpointGroup&quot;</em><em>]</em>) – A dictionary mapping nested resource names
+to their corresponding <cite>EndpointGroup</cite>.
+Uses a forward reference string due to self-reference.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#EndpointGroup.Config"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.Config" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.Config.arbitrary_types_allowed">
+<span class="sig-name descname"><span class="pre">arbitrary_types_allowed</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.Config.arbitrary_types_allowed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.all">
+<span class="sig-name descname"><span class="pre">all</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.all" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.children">
+<span class="sig-name descname"><span class="pre">children</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <span class="pre">EndpointGroup]</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.children" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True}</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointGroup.single">
+<span class="sig-name descname"><span class="pre">single</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference internal" href="#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointGroup.single" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointMap">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">EndpointMap</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">root</span></span><span class="o"><span class="pre">=</span></span><span class="default_value"><span class="pre">PydanticUndefined</span></span></em>, <em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#EndpointMap"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.EndpointMap" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">RootModel[Dict[str,</span> <span class="pre">EndpointGroup]]</span></code></p>
+<p>The main container for the entire endpoint map structure.</p>
+<p>Uses Pydantic’s <cite>RootModel</cite> to represent a dictionary where keys are
+top-level resource names (e.g., «products», «orders») and values are
+their corresponding <cite>EndpointGroup</cite> objects. Provides attribute access
+to these top-level groups.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>root</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.TypeVar" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">TypeVar</span></code></a>(<code class="docutils literal notranslate"><span class="pre">RootModelRootType</span></code>)</span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointMap.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointMap.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.endpoint_map.EndpointMap.root">
+<span class="sig-name descname"><span class="pre">root</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference internal" href="#schemas.endpoint_map.EndpointGroup" title="schemas.endpoint_map.EndpointGroup"><code class="xref py py-class docutils literal notranslate"><span class="pre">EndpointGroup</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.endpoint_map.EndpointMap.root" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schemas.endpoint_map.build_endpoint_map">
+<span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">build_endpoint_map</span></span><span class="sig-paren">(</span><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#build_endpoint_map"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.build_endpoint_map" title="Link to this definition"></a></dt>
+<dd><p>Constructs the complete, structured <cite>EndpointMap</cite> from the configuration list.</p>
+<p>Orchestrates the process:
+1. Builds the intermediate dictionary tree using <cite>build_tree_corrected</cite>.
+2. Transforms the tree into nested <cite>EndpointGroup</cite> objects using <cite>tree_to_endpoint_group</cite>.
+3. Validates and wraps the result in an <cite>EndpointMap</cite> (RootModel).</p>
+<dl class="field-list simple">
+<dt class="field-odd">Devuelve<span class="colon">:</span></dt>
+<dd class="field-odd"><p>The fully constructed and validated endpoint map object.</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference internal" href="#schemas.endpoint_map.EndpointMap" title="schemas.endpoint_map.EndpointMap">EndpointMap</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schemas.endpoint_map.build_tree_corrected">
+<span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">build_tree_corrected</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">endpoints</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#build_tree_corrected"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.build_tree_corrected" title="Link to this definition"></a></dt>
+<dd><p>Builds a nested dictionary representation (tree) from a flat list of endpoint paths.</p>
+<p>Parses each path string, splitting it into segments. It organizes these segments
+into a hierarchical dictionary structure, distinguishing between collection endpoints (“all”)
+and single instance endpoints (“single”) based on path structure and the presence
+of trailing path parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>endpoints</strong> (<em>List</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>]</em>) – A list of endpoint path strings (e.g., from <cite>ENDPOINTS_LIST</cite>).</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p><dl class="simple">
+<dt>A nested dictionary representing the endpoint hierarchy.</dt><dd><p>Each node has keys «all», «single», and «children».</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p>Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)">str</a>, Dict]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="schemas.endpoint_map.tree_to_endpoint_group">
+<span class="sig-prename descclassname"><span class="pre">schemas.endpoint_map.</span></span><span class="sig-name descname"><span class="pre">tree_to_endpoint_group</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">tree_node</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/endpoint_map.html#tree_to_endpoint_group"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.endpoint_map.tree_to_endpoint_group" title="Link to this definition"></a></dt>
+<dd><p>Recursively transforms a dictionary tree node into an <cite>EndpointGroup</cite> object.</p>
+<p>Converts the string paths stored in the tree (“all”, “single”) into <cite>Endpoint</cite>
+objects, calculating argument counts and attempting to map validation models.
+Recursively calls itself for child nodes.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>tree_node</strong> (<em>Dict</em>) – A dictionary node from the tree built by <cite>build_tree_corrected</cite>.</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>The corresponding <cite>EndpointGroup</cite> object with nested children.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference internal" href="#schemas.endpoint_map.EndpointGroup" title="schemas.endpoint_map.EndpointGroup">EndpointGroup</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="endpoint_config.html" class="btn btn-neutral float-left" title="Configuración de Endpoints (endpoint_config)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="request_schemas.html" class="btn btn-neutral float-right" title="Esquemas de Petición (request_schemas)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

@@ -1,0 +1,251 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>dataframe_utils &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">dataframe_utils</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para dataframe_utils</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Utility functions for processing and validating DataFrame data, particularly</span>
+<span class="sd">for internationalization (i18n) fields and payload reformatting based on Pydantic models.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">schemas.validation_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationModel</span><span class="p">,</span> <span class="n">i18nField</span><span class="p">,</span> <span class="n">Variant</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">schemas.config_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">StoreConfig</span><span class="p">,</span> <span class="n">DEFAULT_CONFIG</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">get_origin</span><span class="p">,</span> <span class="n">get_args</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Any</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">log_db</span><span class="w"> </span><span class="kn">import</span> <span class="n">stdout_logger</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">pandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">pd</span>
+
+<div class="viewcode-block" id="is_field_type_i18n">
+<a class="viewcode-back" href="../dataframe_utils.html#dataframe_utils.is_field_type_i18n">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">is_field_type_i18n</span><span class="p">(</span><span class="n">model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ValidationModel</span><span class="p">],</span> <span class="n">field_name</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Checks if the type annotation of a field in a Pydantic model is</span>
+<span class="sd">    i18nField or Optional[i18nField].</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        model (Type[ValidationModel]): The Pydantic model class.</span>
+<span class="sd">        field_name (str): The name of the field to check within the model.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        bool: True if the field type is i18nField or Optional[i18nField],</span>
+<span class="sd">              False otherwise.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># Check if the field exists in the model</span>
+    <span class="k">if</span> <span class="n">field_name</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">model</span><span class="o">.</span><span class="n">model_fields</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">field_info</span> <span class="o">=</span> <span class="n">model</span><span class="o">.</span><span class="n">model_fields</span><span class="p">[</span><span class="n">field_name</span><span class="p">]</span>
+    <span class="n">annotation</span> <span class="o">=</span> <span class="n">field_info</span><span class="o">.</span><span class="n">annotation</span>
+
+    <span class="c1"># Direct check for i18nField</span>
+    <span class="k">if</span> <span class="n">annotation</span> <span class="ow">is</span> <span class="n">i18nField</span><span class="p">:</span>
+        <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="c1"># Check for Optional[i18nField] (represented as Union[i18nField, NoneType])</span>
+    <span class="n">origin</span> <span class="o">=</span> <span class="n">get_origin</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+    <span class="n">args</span> <span class="o">=</span> <span class="n">get_args</span><span class="p">(</span><span class="n">annotation</span><span class="p">)</span>
+
+    <span class="k">if</span> <span class="n">origin</span> <span class="ow">is</span> <span class="n">Union</span><span class="p">:</span>
+        <span class="c1"># Check if i18nField is one of the types in the Union</span>
+        <span class="k">if</span> <span class="n">i18nField</span> <span class="ow">in</span> <span class="n">args</span><span class="p">:</span>
+             <span class="k">return</span> <span class="kc">True</span>
+
+    <span class="k">return</span> <span class="kc">False</span></div>
+
+
+
+<div class="viewcode-block" id="parse_i18n">
+<a class="viewcode-back" href="../dataframe_utils.html#dataframe_utils.parse_i18n">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">parse_i18n</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">key</span><span class="p">:</span> <span class="nb">str</span><span class="p">,</span> <span class="n">store_config</span><span class="p">:</span> <span class="n">StoreConfig</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Parses or transforms a value in the payload dictionary for an i18n field.</span>
+
+<span class="sd">    If the value is a valid JSON string representing an i18n structure (dict</span>
+<span class="sd">    with language codes as keys), it&#39;s parsed and used directly.</span>
+<span class="sd">    Otherwise, the value is replicated for all languages specified in</span>
+<span class="sd">    `store_config.modify_languages`. Handles potential NaN values from pandas.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        payload_arguments (Dict[str, Any]): The dictionary containing payload data.</span>
+<span class="sd">            This dictionary is modified in-place.</span>
+<span class="sd">        key (str): The key in `payload_arguments` corresponding to the i18n field.</span>
+<span class="sd">        store_config (StoreConfig): The store configuration containing language settings.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        None: The `payload_arguments` dictionary is modified directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Attempt to load the argument as JSON</span>
+        <span class="n">json_argument</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">loads</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">[</span><span class="n">key</span><span class="p">])</span>
+        <span class="c1"># Check if the loaded JSON looks like an i18n dictionary already</span>
+        <span class="c1"># by seeing if any keys match the enabled languages</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">json_argument</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> \
+           <span class="nb">any</span><span class="p">(</span><span class="n">lang_key</span> <span class="ow">in</span> <span class="n">store_config</span><span class="o">.</span><span class="n">enabled_languages</span> <span class="k">for</span> <span class="n">lang_key</span> <span class="ow">in</span> <span class="n">json_argument</span><span class="o">.</span><span class="n">keys</span><span class="p">()):</span>
+            <span class="c1"># If it&#39;s already in the correct i18n format, keep it as is</span>
+            <span class="n">payload_arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="n">json_argument</span>
+        <span class="k">else</span><span class="p">:</span>
+             <span class="c1"># If it&#39;s valid JSON but not the expected i18n structure, treat it as a single value</span>
+             <span class="c1"># to be replicated across languages (fall through to the except block logic)</span>
+             <span class="k">raise</span> <span class="ne">TypeError</span><span class="p">(</span><span class="s2">&quot;JSON is not in expected i18n format&quot;</span><span class="p">)</span>
+    <span class="k">except</span> <span class="p">(</span><span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">,</span> <span class="ne">TypeError</span><span class="p">):</span>
+        <span class="c1"># Handle cases where the value is not valid JSON or not the expected i18n structure</span>
+        <span class="c1"># Treat NaN as None, otherwise use the value directly</span>
+        <span class="n">value</span> <span class="o">=</span> <span class="kc">None</span> <span class="k">if</span> <span class="n">pd</span><span class="o">.</span><span class="n">isna</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">[</span><span class="n">key</span><span class="p">])</span> <span class="k">else</span> <span class="n">payload_arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span>
+        <span class="c1"># Create the i18n dictionary by replicating the value for modify_languages</span>
+        <span class="n">payload_arguments</span><span class="p">[</span><span class="n">key</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="n">lang</span><span class="p">:</span> <span class="n">value</span> <span class="k">for</span> <span class="n">lang</span> <span class="ow">in</span> <span class="n">store_config</span><span class="o">.</span><span class="n">modify_languages</span><span class="p">}</span></div>
+
+
+<div class="viewcode-block" id="reformat_payload">
+<a class="viewcode-back" href="../dataframe_utils.html#dataframe_utils.reformat_payload">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">reformat_payload</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span>
+                     <span class="n">keys_to_reformat</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">],</span>
+                     <span class="n">validation_model</span><span class="p">:</span> <span class="n">Type</span><span class="p">[</span><span class="n">ValidationModel</span><span class="p">],</span>
+                     <span class="n">store_config</span><span class="p">:</span> <span class="n">StoreConfig</span> <span class="o">=</span> <span class="n">DEFAULT_CONFIG</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Reformats payload arguments based on the expected validation model and store configuration.</span>
+
+<span class="sd">    Specifically handles i18n fields by calling `parse_i18n` and aggregates</span>
+<span class="sd">    &#39;option_value_X&#39; fields into a &#39;values&#39; list for the `Variant` model.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        payload_arguments (Dict[str, Any]): The dictionary of arguments extracted</span>
+<span class="sd">            from a data row, intended as payload. This dictionary might be modified.</span>
+<span class="sd">        keys_to_reformat (List[str]): A list of keys within `payload_arguments`</span>
+<span class="sd">            that potentially need reformatting based on the `validation_model`.</span>
+<span class="sd">        validation_model (Type[ValidationModel]): The Pydantic model used to</span>
+<span class="sd">            validate and determine the structure of the payload.</span>
+<span class="sd">        store_config (StoreConfig, optional): The store configuration, primarily</span>
+<span class="sd">            for language settings. Defaults to DEFAULT_CONFIG.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Any]: The potentially modified `payload_arguments` dictionary</span>
+<span class="sd">            with fields reformatted according to the model and configuration.</span>
+
+<span class="sd">    Raises:</span>
+<span class="sd">        ValueError: If the payload contains both a &#39;values&#39; key and</span>
+<span class="sd">                    &#39;option_value_X&#39; keys when the validation model is `Variant`.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">values</span> <span class="o">=</span> <span class="p">[]</span> <span class="c1"># Initialize list to collect option values for Variants</span>
+    <span class="k">for</span> <span class="n">key</span> <span class="ow">in</span> <span class="n">keys_to_reformat</span><span class="p">:</span>
+        <span class="c1"># Check and parse if the field is an i18n field</span>
+        <span class="k">if</span> <span class="n">is_field_type_i18n</span><span class="p">(</span><span class="n">validation_model</span><span class="p">,</span> <span class="n">key</span><span class="p">):</span>
+            <span class="n">parse_i18n</span><span class="p">(</span><span class="n">payload_arguments</span><span class="p">,</span> <span class="n">key</span><span class="p">,</span> <span class="n">store_config</span><span class="p">)</span>
+
+        <span class="c1"># Special handling for Variant option values</span>
+        <span class="k">if</span> <span class="n">key</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;option_value_1&#39;</span><span class="p">,</span> <span class="s1">&#39;option_value_2&#39;</span><span class="p">,</span> <span class="s1">&#39;option_value_3&#39;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">validation_model</span> <span class="o">==</span> <span class="n">Variant</span><span class="p">:</span>
+            <span class="c1"># Check for conflict: &#39;values&#39; key should not coexist with &#39;option_value_X&#39;</span>
+            <span class="k">if</span> <span class="s1">&#39;values&#39;</span> <span class="ow">in</span> <span class="n">payload_arguments</span><span class="p">:</span>
+                <span class="n">conflicting_keys</span> <span class="o">=</span> <span class="p">[</span><span class="n">k</span> <span class="k">for</span> <span class="n">k</span> <span class="ow">in</span> <span class="n">payload_arguments</span> <span class="k">if</span> <span class="n">k</span> <span class="ow">in</span> <span class="p">(</span><span class="s1">&#39;option_value_1&#39;</span><span class="p">,</span> <span class="s1">&#39;option_value_2&#39;</span><span class="p">,</span> <span class="s1">&#39;option_value_3&#39;</span><span class="p">)]</span>
+                <span class="n">stdout_logger</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Payload contains both &#39;values&#39; and &#39;</span><span class="si">{</span><span class="n">conflicting_keys</span><span class="si">}</span><span class="s2">&#39;. Please remove one of them.&quot;</span><span class="p">)</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Payload contains both &#39;values&#39; and &#39;</span><span class="si">{</span><span class="n">conflicting_keys</span><span class="si">}</span><span class="s2">&#39;. Please remove one of them.&quot;</span><span class="p">)</span>
+            <span class="c1"># Collect the option value and remove the original key</span>
+            <span class="n">values</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">payload_arguments</span><span class="o">.</span><span class="n">pop</span><span class="p">(</span><span class="n">key</span><span class="p">))</span>
+
+    <span class="c1"># If option values were collected, add them as a &#39;values&#39; list</span>
+    <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">values</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+        <span class="n">payload_arguments</span><span class="p">[</span><span class="s1">&#39;values&#39;</span><span class="p">]</span> <span class="o">=</span> <span class="n">values</span>
+
+    <span class="k">return</span> <span class="n">payload_arguments</span></div>
+
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

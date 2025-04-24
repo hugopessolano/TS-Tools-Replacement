@@ -1,0 +1,508 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>schemas.request_schemas &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">schemas.request_schemas</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para schemas.request_schemas</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines Pydantic models for representing API requests and their prepared data.</span>
+
+<span class="sd">Includes a base `Request` model and subclasses for specific HTTP methods</span>
+<span class="sd">(GET, POST, PUT, DELETE), handling URL construction with path parameters</span>
+<span class="sd">and query strings. Also defines `RequestData` to hold information needed</span>
+<span class="sd">for execution by `httpx` and to store/process the response.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">PrivateAttr</span><span class="p">,</span> <span class="n">Field</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Any</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Tuple</span><span class="p">,</span> <span class="n">Union</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">urllib.parse</span><span class="w"> </span><span class="kn">import</span> <span class="n">urlencode</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">logging</span> <span class="c1"># Use standard logging for internal model logic if needed</span>
+
+<span class="c1"># Attempt import from schemas package, fallback for direct execution</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">schemas.endpoint_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">Endpoint</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">endpoint_map</span><span class="w"> </span><span class="kn">import</span> <span class="n">Endpoint</span> <span class="c1"># Fallback</span>
+
+<span class="c1"># Import Response type hint, but avoid runtime dependency if possible</span>
+<span class="c1"># This helps type checkers but doesn&#39;t force httpx installation just for this schema</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">httpx</span><span class="w"> </span><span class="kn">import</span> <span class="n">Response</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="n">Response</span> <span class="o">=</span> <span class="n">Any</span> <span class="c1"># Fallback type if httpx is not installed</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<span class="c1"># --- Base Request Model ---</span>
+
+<div class="viewcode-block" id="Request">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.Request">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Request</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Base model for representing an API request intention.</span>
+
+<span class="sd">    Contains the target endpoint configuration, HTTP method, and any</span>
+<span class="sd">    positional arguments needed to format the final URL path.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        endpoint (Endpoint): The endpoint configuration object, containing the</span>
+<span class="sd">                             base path template and associated metadata.</span>
+<span class="sd">        method (str): The HTTP method (e.g., &quot;GET&quot;, &quot;POST&quot;). To be overridden by subclasses.</span>
+<span class="sd">        positional_url_arguments (Optional[Tuple[str, ...]]): A tuple of string values</span>
+<span class="sd">                                                               to substitute into the</span>
+<span class="sd">                                                               endpoint path placeholders</span>
+<span class="sd">                                                               (e.g., {arg_1}, {arg_2}).</span>
+<span class="sd">        endpoint_url (str): The fully formatted URL path (without query parameters yet),</span>
+<span class="sd">                            generated after initialization.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">endpoint</span><span class="p">:</span> <span class="n">Endpoint</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="c1"># Must be overridden by subclasses</span>
+    <span class="n">positional_url_arguments</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Tuple</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="o">...</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Field to store the formatted URL path after initialization</span>
+    <span class="n">endpoint_url</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;&quot;</span>
+
+<div class="viewcode-block" id="Request.model_post_init">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.Request.model_post_init">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Post-initialization hook to format the `endpoint_url`.</span>
+
+<span class="sd">        Constructs the final URL path by substituting `positional_url_arguments`</span>
+<span class="sd">        into the placeholders (`{arg_1}`, `{arg_2}`, etc.) defined in the</span>
+<span class="sd">        `endpoint.path`. Validates that the number of arguments provided matches</span>
+<span class="sd">        the number of placeholders in the path template.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            __context (Any): Pydantic validation context (unused).</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            ValueError: If the number of provided arguments does not match the</span>
+<span class="sd">                        number of placeholders in the endpoint path, or if</span>
+<span class="sd">                        formatting fails for other reasons.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Ensure any parent class post_init logic runs first (if applicable in future)</span>
+        <span class="c1"># super().model_post_init(__context) # Not strictly needed here as BaseModel has no default</span>
+
+        <span class="n">path_template</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">path</span> <span class="c1"># Use the original path from Endpoint</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">positional_url_arguments</span><span class="p">:</span>
+            <span class="n">num_provided_args</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positional_url_arguments</span><span class="p">)</span>
+            <span class="c1"># Use the count pre-calculated in the Endpoint model</span>
+            <span class="n">num_expected_args</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span>
+
+            <span class="k">if</span> <span class="n">num_provided_args</span> <span class="o">!=</span> <span class="n">num_expected_args</span><span class="p">:</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Endpoint &#39;</span><span class="si">{</span><span class="n">path_template</span><span class="si">}</span><span class="s2">&#39; expects </span><span class="si">{</span><span class="n">num_expected_args</span><span class="si">}</span><span class="s2"> positional arguments, &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;but </span><span class="si">{</span><span class="n">num_provided_args</span><span class="si">}</span><span class="s2"> were provided: </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">positional_url_arguments</span><span class="si">}</span><span class="s2">&quot;</span>
+                <span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Create dictionary for .format: {&#39;arg_1&#39;: val1, &#39;arg_2&#39;: val2, ...}</span>
+                <span class="n">format_args</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="sa">f</span><span class="s2">&quot;arg_</span><span class="si">{</span><span class="n">i</span><span class="o">+</span><span class="mi">1</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">:</span> <span class="n">arg</span>
+                    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">arg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">positional_url_arguments</span><span class="p">)</span>
+                <span class="p">}</span>
+                <span class="c1"># Perform the substitution using the original path template</span>
+                <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_url</span> <span class="o">=</span> <span class="n">path_template</span><span class="o">.</span><span class="n">format</span><span class="p">(</span><span class="o">**</span><span class="n">format_args</span><span class="p">)</span>
+            <span class="k">except</span> <span class="p">(</span><span class="ne">KeyError</span><span class="p">,</span> <span class="ne">IndexError</span><span class="p">)</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Catch potential errors if placeholders don&#39;t match arg_n format</span>
+                <span class="c1"># or if arguments somehow mismatch during formatting.</span>
+                <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Error formatting endpoint path &#39;</span><span class="si">{</span><span class="n">path_template</span><span class="si">}</span><span class="s2">&#39; with arguments &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">positional_url_arguments</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">. Ensure path uses </span><span class="se">{{</span><span class="s2">arg_n</span><span class="se">}}</span><span class="s2"> placeholders.&quot;</span>
+                <span class="p">)</span> <span class="kn">from</span><span class="w"> </span><span class="nn">e</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># If no arguments provided, check if the path expects any</span>
+            <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span> <span class="o">&gt;</span> <span class="mi">0</span><span class="p">:</span>
+                 <span class="k">raise</span> <span class="ne">ValueError</span><span class="p">(</span>
+                    <span class="sa">f</span><span class="s2">&quot;Endpoint &#39;</span><span class="si">{</span><span class="n">path_template</span><span class="si">}</span><span class="s2">&#39; expects </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="si">}</span><span class="s2"> &quot;</span>
+                    <span class="sa">f</span><span class="s2">&quot;positional arguments, but none were provided.&quot;</span>
+                 <span class="p">)</span>
+            <span class="c1"># No arguments needed or provided, use the path as is</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_url</span> <span class="o">=</span> <span class="n">path_template</span></div>
+</div>
+
+
+<span class="c1"># --- Specific HTTP Method Request Models ---</span>
+
+<div class="viewcode-block" id="GetRequest">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.GetRequest">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">GetRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a GET request, potentially including URL query parameters.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        params (Optional[Dict[str, Any]]): A dictionary of query parameters to append</span>
+<span class="sd">                                           to the URL (e.g., {&quot;page&quot;: 1, &quot;limit&quot;: 10}).</span>
+<span class="sd">        method (str): Set to &quot;GET&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">params</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;GET&quot;</span>
+
+<div class="viewcode-block" id="GetRequest.model_post_init">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.GetRequest.model_post_init">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">model_post_init</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">__context</span><span class="p">:</span> <span class="n">Any</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Post-initialization hook for GET requests.</span>
+
+<span class="sd">        Runs after the base `Request.model_post_init` to format the base URL path.</span>
+<span class="sd">        Then, if `params` are provided, it URL-encodes them and appends them</span>
+<span class="sd">        as a query string to the `endpoint_url`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            __context (Any): Pydantic validation context (unused).</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="nb">super</span><span class="p">()</span><span class="o">.</span><span class="n">model_post_init</span><span class="p">(</span><span class="n">__context</span><span class="p">)</span> <span class="c1"># Format base URL path first</span>
+
+        <span class="k">if</span> <span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">:</span>
+            <span class="c1"># Encode the dictionary of parameters into a query string</span>
+            <span class="n">query_string</span> <span class="o">=</span> <span class="n">urlencode</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">params</span><span class="p">)</span>
+            <span class="c1"># Append the query string to the formatted URL path</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">endpoint_url</span> <span class="o">+=</span> <span class="sa">f</span><span class="s2">&quot;?</span><span class="si">{</span><span class="n">query_string</span><span class="si">}</span><span class="s2">&quot;</span></div>
+</div>
+
+
+<div class="viewcode-block" id="PostRequest">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.PostRequest">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PostRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a POST request, potentially including a JSON payload.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        payload (Optional[Dict[str, Any]]): The JSON payload to send in the request body.</span>
+<span class="sd">        method (str): Set to &quot;POST&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;POST&quot;</span></div>
+
+
+<div class="viewcode-block" id="PutRequest">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.PutRequest">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">PutRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a PUT request, typically including a JSON payload.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        payload (Dict[str, Any]): The JSON payload to send in the request body.</span>
+<span class="sd">                                  Marked as non-optional for typical PUT usage.</span>
+<span class="sd">        method (str): Set to &quot;PUT&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]</span> <span class="c1"># Payload is usually required for PUT</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;PUT&quot;</span></div>
+
+
+<div class="viewcode-block" id="DeleteRequest">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.DeleteRequest">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">DeleteRequest</span><span class="p">(</span><span class="n">Request</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a DELETE request. Typically does not include a payload.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        method (str): Set to &quot;DELETE&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span> <span class="o">=</span> <span class="s2">&quot;DELETE&quot;</span></div>
+
+
+<span class="c1"># --- Request Data Model for Execution ---</span>
+
+<div class="viewcode-block" id="RequestData">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.RequestData">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">RequestData</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Holds prepared data for executing a single API request via `httpx`.</span>
+
+<span class="sd">    This model bridges the gap between the abstract `Request` models and the</span>
+<span class="sd">    concrete data needed by `httpx.AsyncClient`. It also stores the response</span>
+<span class="sd">    information after execution.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        url (str): The complete, final URL for the request (including base, path, and query string).</span>
+<span class="sd">        headers (dict): The dictionary of HTTP headers to send.</span>
+<span class="sd">        method (str): The HTTP method (e.g., &quot;GET&quot;, &quot;POST&quot;).</span>
+<span class="sd">        payload (Optional[Dict[str, Any]]): The JSON payload for POST/PUT requests.</span>
+<span class="sd">        response_status (Optional[int]): The HTTP status code of the received response.</span>
+<span class="sd">        response_headers (Optional[Dict[str, Any]]): The headers received in the response.</span>
+<span class="sd">        _response (Optional[Union[Dict[str, Any], Response]]): Private attribute storing</span>
+<span class="sd">            either the raw `httpx.Response` object initially, or the processed JSON</span>
+<span class="sd">            dictionary after the `response` property is accessed or set.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">url</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">headers</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="nb">str</span><span class="p">]</span> <span class="c1"># Changed type hint for clarity</span>
+    <span class="n">method</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">payload</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">response_status</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">response_headers</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Private attribute to hold the raw httpx.Response or processed dict</span>
+    <span class="n">_response</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Response</span><span class="p">]]</span> <span class="o">=</span> <span class="n">PrivateAttr</span><span class="p">(</span><span class="n">default</span><span class="o">=</span><span class="kc">None</span><span class="p">)</span>
+
+<div class="viewcode-block" id="RequestData.Config">
+<a class="viewcode-back" href="../../schemas/request_schemas.html#schemas.request_schemas.RequestData.Config">[documentos]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+        <span class="c1"># Allow arbitrary types like httpx.Response in _response initially</span>
+        <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
+
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">response</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">]]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Provides access to the processed response body as a dictionary.</span>
+
+<span class="sd">        If the internal `_response` is still an `httpx.Response` object</span>
+<span class="sd">        (meaning it hasn&#39;t been processed yet), this property access triggers</span>
+<span class="sd">        the processing (`_process_assigned_response`) to extract the status code,</span>
+<span class="sd">        headers, and JSON body. It then returns the processed dictionary body.</span>
+<span class="sd">        If processing fails or the response was already None, returns None.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            Optional[Dict[str, Any]]: The JSON response body as a dictionary,</span>
+<span class="sd">                                      or None if processing failed or no response exists.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">,</span> <span class="n">Response</span><span class="p">):</span>
+            <span class="c1"># Log a warning if accessed while still raw - indicates potential direct manipulation needed</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Accessing RequestData.response property for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> while internal state is still httpx.Response. Processing now.&quot;</span><span class="p">)</span>
+            <span class="c1"># Process the raw response into status, headers, and dict body</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_process_assigned_response</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">)</span>
+            <span class="c1"># Return the processed dict, or None if processing failed</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span> <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="k">else</span> <span class="kc">None</span>
+        <span class="c1"># If already processed or was None, return the stored value</span>
+        <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span>
+
+    <span class="nd">@response</span><span class="o">.</span><span class="n">setter</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Response</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Sets the response, triggering processing if an `httpx.Response` is assigned.</span>
+
+<span class="sd">        Allows assigning either a raw `httpx.Response` object (which will be</span>
+<span class="sd">        processed) or a pre-processed dictionary/None directly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (Optional[Union[Dict[str, Any], Response]]): The response object or dictionary.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="bp">self</span><span class="o">.</span><span class="n">_process_assigned_response</span><span class="p">(</span><span class="n">value</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="nf">_process_assigned_response</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">value</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Union</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Any</span><span class="p">],</span> <span class="n">Response</span><span class="p">]]):</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Internal helper to process and store the response value.</span>
+
+<span class="sd">        If `value` is an `httpx.Response`, extracts status code, headers, and attempts</span>
+<span class="sd">        to parse the JSON body. Stores these in the respective attributes and updates</span>
+<span class="sd">        `_response` to the processed dictionary body (or an error dict if JSON parsing fails).</span>
+<span class="sd">        If `value` is already a dict or None, stores it directly.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            value (Optional[Union[Dict[str, Any], Response]]): The value assigned to the response.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="n">Response</span><span class="p">):</span>
+            <span class="n">httpx_response</span><span class="p">:</span> <span class="n">Response</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="n">status_code</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">processed_response_body</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="n">headers</span> <span class="o">=</span> <span class="p">{}</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="n">status_code</span> <span class="o">=</span> <span class="n">httpx_response</span><span class="o">.</span><span class="n">status_code</span>
+                <span class="n">headers</span> <span class="o">=</span> <span class="nb">dict</span><span class="p">(</span><span class="n">httpx_response</span><span class="o">.</span><span class="n">headers</span><span class="p">)</span> <span class="c1"># Store headers</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Log error if basic attributes can&#39;t be accessed (should be rare)</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to get status code/headers from httpx.Response for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Attempt to parse the response body as JSON</span>
+                <span class="n">processed_response_body</span> <span class="o">=</span> <span class="n">httpx_response</span><span class="o">.</span><span class="n">json</span><span class="p">()</span>
+            <span class="k">except</span> <span class="n">json</span><span class="o">.</span><span class="n">JSONDecodeError</span><span class="p">:</span>
+                <span class="c1"># Handle cases where the response body isn&#39;t valid JSON</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">warning</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Response body is not valid JSON for URL </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">. Status: </span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="c1"># Store an error dictionary instead of the raw text</span>
+                <span class="n">processed_response_body</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;JSONDecodeError&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="s2">&quot;Response body is not valid JSON.&quot;</span><span class="p">,</span>
+                    <span class="c1"># Optionally include raw text, but be mindful of size/sensitivity</span>
+                    <span class="c1"># &quot;raw_body&quot;: httpx_response.text[:500] # Limit size</span>
+                <span class="p">}</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="c1"># Handle other potential errors during .json() processing</span>
+                <span class="n">logging</span><span class="o">.</span><span class="n">error</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Failed to process response body for URL </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">exc_info</span><span class="o">=</span><span class="kc">True</span><span class="p">)</span>
+                <span class="n">processed_response_body</span> <span class="o">=</span> <span class="p">{</span>
+                    <span class="s2">&quot;error&quot;</span><span class="p">:</span> <span class="s2">&quot;ResponseBodyProcessingError&quot;</span><span class="p">,</span>
+                    <span class="s2">&quot;message&quot;</span><span class="p">:</span> <span class="nb">str</span><span class="p">(</span><span class="n">e</span><span class="p">)</span>
+                <span class="p">}</span>
+
+            <span class="c1"># Update the model attributes</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_status</span> <span class="o">=</span> <span class="n">status_code</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">response_headers</span> <span class="o">=</span> <span class="n">headers</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_response</span> <span class="o">=</span> <span class="n">processed_response_body</span> <span class="c1"># Store the processed dict (or error dict)</span>
+            <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Processed httpx.Response for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2">: Status=</span><span class="si">{</span><span class="n">status_code</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Value is already a dict or None</span>
+            <span class="bp">self</span><span class="o">.</span><span class="n">_response</span> <span class="o">=</span> <span class="n">value</span>
+            <span class="c1"># Reset status/headers if response is explicitly set to None</span>
+            <span class="k">if</span> <span class="n">value</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">response_status</span> <span class="o">=</span> <span class="kc">None</span>
+                 <span class="bp">self</span><span class="o">.</span><span class="n">response_headers</span> <span class="o">=</span> <span class="kc">None</span>
+            <span class="c1"># Log if a dict is assigned directly without status (might be manual assignment)</span>
+            <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">value</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="bp">self</span><span class="o">.</span><span class="n">response_status</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+                 <span class="n">logging</span><span class="o">.</span><span class="n">debug</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Dict assigned directly to response for </span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="n">url</span><span class="si">}</span><span class="s2"> without explicit status code.&quot;</span><span class="p">)</span>
+
+    <span class="nd">@property</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">response_text</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span> <span class="o">|</span> <span class="kc">None</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot; Provides access to the raw response text if available. &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">,</span> <span class="n">Response</span><span class="p">):</span>
+             <span class="k">try</span><span class="p">:</span>
+                 <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="o">.</span><span class="n">text</span>
+             <span class="k">except</span> <span class="ne">Exception</span><span class="p">:</span>
+                 <span class="k">return</span> <span class="kc">None</span> <span class="c1"># Or return an error message</span>
+        <span class="k">elif</span> <span class="nb">isinstance</span><span class="p">(</span><span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">,</span> <span class="nb">dict</span><span class="p">)</span> <span class="ow">and</span> <span class="s2">&quot;raw_body&quot;</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">:</span>
+             <span class="c1"># If we stored raw_body in case of JSON error</span>
+             <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">_response</span><span class="p">[</span><span class="s2">&quot;raw_body&quot;</span><span class="p">]</span>
+        <span class="c1"># Cannot get raw text if it&#39;s already processed to dict or was None</span>
+        <span class="k">return</span> <span class="kc">None</span></div>
+
+
+
+<span class="c1"># --- Example Usage ---</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example block demonstrating instantiation of request models.</span>
+<span class="sd">    This only runs when the script is executed directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;--- Request Schema Examples ---&quot;</span><span class="p">)</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="c1"># Example GET request</span>
+        <span class="n">get_request</span> <span class="o">=</span> <span class="n">GetRequest</span><span class="p">(</span>
+            <span class="n">endpoint</span><span class="o">=</span><span class="n">Endpoint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;/products/</span><span class="si">{arg_1}</span><span class="s2">/variants/</span><span class="si">{arg_2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">positional_arguments_count</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+            <span class="n">positional_url_arguments</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;prod_123&quot;</span><span class="p">,</span> <span class="s2">&quot;var_456&quot;</span><span class="p">),</span>
+            <span class="n">params</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;fields&quot;</span><span class="p">:</span> <span class="s2">&quot;id,sku&quot;</span><span class="p">,</span> <span class="s2">&quot;limit&quot;</span><span class="p">:</span> <span class="mi">50</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example GET URL: </span><span class="si">{</span><span class="n">get_request</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example GET Model: </span><span class="si">{</span><span class="n">get_request</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Example POST request</span>
+        <span class="n">post_request</span> <span class="o">=</span> <span class="n">PostRequest</span><span class="p">(</span>
+             <span class="n">endpoint</span><span class="o">=</span><span class="n">Endpoint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;/products&quot;</span><span class="p">,</span> <span class="n">positional_arguments_count</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+             <span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="s2">&quot;New Product&quot;</span><span class="p">,</span> <span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mf">99.99</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example POST URL: </span><span class="si">{</span><span class="n">post_request</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example POST Model: </span><span class="si">{</span><span class="n">post_request</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Example PUT request</span>
+        <span class="n">put_request</span> <span class="o">=</span> <span class="n">PutRequest</span><span class="p">(</span>
+             <span class="n">endpoint</span><span class="o">=</span><span class="n">Endpoint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;/products/</span><span class="si">{arg_1}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">positional_arguments_count</span><span class="o">=</span><span class="mi">1</span><span class="p">),</span>
+             <span class="n">positional_url_arguments</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;prod_123&quot;</span><span class="p">,),</span>
+             <span class="n">payload</span><span class="o">=</span><span class="p">{</span><span class="s2">&quot;price&quot;</span><span class="p">:</span> <span class="mf">89.99</span><span class="p">}</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example PUT URL: </span><span class="si">{</span><span class="n">put_request</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example PUT Model: </span><span class="si">{</span><span class="n">put_request</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="c1"># Example DELETE request</span>
+        <span class="n">delete_request</span> <span class="o">=</span> <span class="n">DeleteRequest</span><span class="p">(</span>
+             <span class="n">endpoint</span><span class="o">=</span><span class="n">Endpoint</span><span class="p">(</span><span class="n">path</span><span class="o">=</span><span class="s2">&quot;/products/</span><span class="si">{arg_1}</span><span class="s2">/images/</span><span class="si">{arg_2}</span><span class="s2">&quot;</span><span class="p">,</span> <span class="n">positional_arguments_count</span><span class="o">=</span><span class="mi">2</span><span class="p">),</span>
+             <span class="n">positional_url_arguments</span><span class="o">=</span><span class="p">(</span><span class="s2">&quot;prod_123&quot;</span><span class="p">,</span> <span class="s2">&quot;img_789&quot;</span><span class="p">)</span>
+        <span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example DELETE URL: </span><span class="si">{</span><span class="n">delete_request</span><span class="o">.</span><span class="n">endpoint_url</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Example DELETE Model: </span><span class="si">{</span><span class="n">delete_request</span><span class="o">.</span><span class="n">model_dump_json</span><span class="p">(</span><span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">ValueError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error during example creation: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">--- Examples End ---&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

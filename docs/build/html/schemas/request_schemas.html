@@ -1,0 +1,529 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Esquemas de Petición (request_schemas) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../search.html" />
+    <link rel="next" title="Esquemas de Validación (validation_schemas)" href="validation_schemas.html" />
+    <link rel="prev" title="Mapa de Endpoints (endpoint_map)" href="endpoint_map.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1 current"><a class="reference internal" href="index.html">Esquemas (<cite>schemas</cite>)</a><ul class="current">
+<li class="toctree-l2"><a class="reference internal" href="config_schemas.html">Esquemas de Configuración (<cite>config_schemas</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="endpoint_config.html">Configuración de Endpoints (<cite>endpoint_config</cite>)</a></li>
+<li class="toctree-l2"><a class="reference internal" href="endpoint_map.html">Mapa de Endpoints (<cite>endpoint_map</cite>)</a></li>
+<li class="toctree-l2 current"><a class="current reference internal" href="#">Esquemas de Petición (<cite>request_schemas</cite>)</a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.DeleteRequest"><code class="docutils literal notranslate"><span class="pre">DeleteRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.DeleteRequest.method"><code class="docutils literal notranslate"><span class="pre">DeleteRequest.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.DeleteRequest.model_config"><code class="docutils literal notranslate"><span class="pre">DeleteRequest.model_config</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.GetRequest"><code class="docutils literal notranslate"><span class="pre">GetRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.GetRequest.method"><code class="docutils literal notranslate"><span class="pre">GetRequest.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.GetRequest.model_config"><code class="docutils literal notranslate"><span class="pre">GetRequest.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.GetRequest.model_post_init"><code class="docutils literal notranslate"><span class="pre">GetRequest.model_post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.GetRequest.params"><code class="docutils literal notranslate"><span class="pre">GetRequest.params</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.PostRequest"><code class="docutils literal notranslate"><span class="pre">PostRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PostRequest.method"><code class="docutils literal notranslate"><span class="pre">PostRequest.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PostRequest.model_config"><code class="docutils literal notranslate"><span class="pre">PostRequest.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PostRequest.payload"><code class="docutils literal notranslate"><span class="pre">PostRequest.payload</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.PutRequest"><code class="docutils literal notranslate"><span class="pre">PutRequest</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PutRequest.method"><code class="docutils literal notranslate"><span class="pre">PutRequest.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PutRequest.model_config"><code class="docutils literal notranslate"><span class="pre">PutRequest.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.PutRequest.payload"><code class="docutils literal notranslate"><span class="pre">PutRequest.payload</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.Request"><code class="docutils literal notranslate"><span class="pre">Request</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.endpoint"><code class="docutils literal notranslate"><span class="pre">Request.endpoint</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.endpoint_url"><code class="docutils literal notranslate"><span class="pre">Request.endpoint_url</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.method"><code class="docutils literal notranslate"><span class="pre">Request.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.model_config"><code class="docutils literal notranslate"><span class="pre">Request.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.model_post_init"><code class="docutils literal notranslate"><span class="pre">Request.model_post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.Request.positional_url_arguments"><code class="docutils literal notranslate"><span class="pre">Request.positional_url_arguments</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l3"><a class="reference internal" href="#schemas.request_schemas.RequestData"><code class="docutils literal notranslate"><span class="pre">RequestData</span></code></a><ul>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.Config"><code class="docutils literal notranslate"><span class="pre">RequestData.Config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.headers"><code class="docutils literal notranslate"><span class="pre">RequestData.headers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.method"><code class="docutils literal notranslate"><span class="pre">RequestData.method</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.model_config"><code class="docutils literal notranslate"><span class="pre">RequestData.model_config</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.model_post_init"><code class="docutils literal notranslate"><span class="pre">RequestData.model_post_init()</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.payload"><code class="docutils literal notranslate"><span class="pre">RequestData.payload</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.response"><code class="docutils literal notranslate"><span class="pre">RequestData.response</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.response_headers"><code class="docutils literal notranslate"><span class="pre">RequestData.response_headers</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.response_status"><code class="docutils literal notranslate"><span class="pre">RequestData.response_status</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.response_text"><code class="docutils literal notranslate"><span class="pre">RequestData.response_text</span></code></a></li>
+<li class="toctree-l4"><a class="reference internal" href="#schemas.request_schemas.RequestData.url"><code class="docutils literal notranslate"><span class="pre">RequestData.url</span></code></a></li>
+</ul>
+</li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="validation_schemas.html">Esquemas de Validación (<cite>validation_schemas</cite>)</a></li>
+</ul>
+</li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="index.html">Esquemas (<cite>schemas</cite>)</a></li>
+      <li class="breadcrumb-item active">Esquemas de Petición (<cite>request_schemas</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="../_sources/schemas/request_schemas.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="esquemas-de-peticion-request-schemas">
+<h1>Esquemas de Petición (<cite>request_schemas</cite>)<a class="headerlink" href="#esquemas-de-peticion-request-schemas" title="Link to this heading"></a></h1>
+<p id="module-schemas.request_schemas">Defines Pydantic models for representing API requests and their prepared data.</p>
+<p>Includes a base <cite>Request</cite> model and subclasses for specific HTTP methods
+(GET, POST, PUT, DELETE), handling URL construction with path parameters
+and query strings. Also defines <cite>RequestData</cite> to hold information needed
+for execution by <cite>httpx</cite> and to store/process the response.</p>
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.DeleteRequest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">DeleteRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#DeleteRequest"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.DeleteRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.request_schemas.Request" title="schemas.request_schemas.Request"><code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code></a></p>
+<p>Represents a DELETE request. Typically does not include a payload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – Set to «DELETE».</p>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.DeleteRequest.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.DeleteRequest.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.DeleteRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.request_schemas.DeleteRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.GetRequest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">GetRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#GetRequest"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.GetRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.request_schemas.Request" title="schemas.request_schemas.Request"><code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code></a></p>
+<p>Represents a GET request, potentially including URL query parameters.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>params</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – A dictionary of query parameters to append
+to the URL (e.g., {«page»: 1, «limit»: 10}).</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – Set to «GET».</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.GetRequest.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.GetRequest.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.GetRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.request_schemas.GetRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.request_schemas.GetRequest.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_GetRequest__context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#GetRequest.model_post_init"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.GetRequest.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>Post-initialization hook for GET requests.</p>
+<p>Runs after the base <cite>Request.model_post_init</cite> to format the base URL path.
+Then, if <cite>params</cite> are provided, it URL-encodes them and appends them
+as a query string to the <cite>endpoint_url</cite>.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>__context</strong> (<em>Any</em>) – Pydantic validation context (unused).</p></li>
+<li><p><strong>_GetRequest__context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.GetRequest.params">
+<span class="sig-name descname"><span class="pre">params</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.request_schemas.GetRequest.params" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.PostRequest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">PostRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#PostRequest"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.PostRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.request_schemas.Request" title="schemas.request_schemas.Request"><code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code></a></p>
+<p>Represents a POST request, potentially including a JSON payload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>payload</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – The JSON payload to send in the request body.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – Set to «POST».</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PostRequest.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.PostRequest.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PostRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.request_schemas.PostRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PostRequest.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.request_schemas.PostRequest.payload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.PutRequest">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">PutRequest</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#PutRequest"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.PutRequest" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference internal" href="#schemas.request_schemas.Request" title="schemas.request_schemas.Request"><code class="xref py py-class docutils literal notranslate"><span class="pre">Request</span></code></a></p>
+<p>Represents a PUT request, typically including a JSON payload.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>payload</strong> (<em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em>) – The JSON payload to send in the request body.
+Marked as non-optional for typical PUT usage.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – Set to «PUT».</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PutRequest.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.PutRequest.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PutRequest.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.request_schemas.PutRequest.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.PutRequest.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.request_schemas.PutRequest.payload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">Request</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#Request"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.Request" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Base model for representing an API request intention.</p>
+<p>Contains the target endpoint configuration, HTTP method, and any
+positional arguments needed to format the final URL path.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>endpoint</strong> (<a class="reference internal" href="endpoint_map.html#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><em>Endpoint</em></a>) – The endpoint configuration object, containing the
+base path template and associated metadata.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The HTTP method (e.g., «GET», «POST»). To be overridden by subclasses.</p></li>
+<li><p><strong>positional_url_arguments</strong> (<em>Optional</em><em>[</em><em>Tuple</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>...</em><em>]</em><em>]</em>) – A tuple of string values
+to substitute into the
+endpoint path placeholders
+(e.g., {arg_1}, {arg_2}).</p></li>
+<li><p><strong>endpoint_url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The fully formatted URL path (without query parameters yet),
+generated after initialization.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.endpoint">
+<span class="sig-name descname"><span class="pre">endpoint</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference internal" href="endpoint_map.html#schemas.endpoint_map.Endpoint" title="schemas.endpoint_map.Endpoint"><code class="xref py py-class docutils literal notranslate"><span class="pre">Endpoint</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.Request.endpoint" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.endpoint_url">
+<span class="sig-name descname"><span class="pre">endpoint_url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.Request.endpoint_url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.Request.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#schemas.request_schemas.Request.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_Request__context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#Request.model_post_init"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.Request.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>Post-initialization hook to format the <cite>endpoint_url</cite>.</p>
+<p>Constructs the final URL path by substituting <cite>positional_url_arguments</cite>
+into the placeholders (<cite>{arg_1}</cite>, <cite>{arg_2}</cite>, etc.) defined in the
+<cite>endpoint.path</cite>. Validates that the number of arguments provided matches
+the number of placeholders in the path template.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>__context</strong> (<em>Any</em>) – Pydantic validation context (unused).</p></li>
+<li><p><strong>_Request__context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Muestra<span class="colon">:</span></dt>
+<dd class="field-even"><p><a class="reference external" href="https://docs.python.org/3/library/exceptions.html#ValueError" title="(en Python versión 3.13)"><strong>ValueError</strong></a> – If the number of provided arguments does not match the
+    number of placeholders in the endpoint path, or if
+    formatting fails for other reasons.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.Request.positional_url_arguments">
+<span class="sig-name descname"><span class="pre">positional_url_arguments</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Tuple" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Tuple</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#Ellipsis" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">...</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.request_schemas.Request.positional_url_arguments" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">schemas.request_schemas.</span></span><span class="sig-name descname"><span class="pre">RequestData</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="../_modules/schemas/request_schemas.html#RequestData"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.RequestData" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Holds prepared data for executing a single API request via <cite>httpx</cite>.</p>
+<p>This model bridges the gap between the abstract <cite>Request</cite> models and the
+concrete data needed by <cite>httpx.AsyncClient</cite>. It also stores the response
+information after execution.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>url</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The complete, final URL for the request (including base, path, and query string).</p></li>
+<li><p><strong>headers</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#dict" title="(en Python versión 3.13)"><em>dict</em></a>) – The dictionary of HTTP headers to send.</p></li>
+<li><p><strong>method</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The HTTP method (e.g., «GET», «POST»).</p></li>
+<li><p><strong>payload</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – The JSON payload for POST/PUT requests.</p></li>
+<li><p><strong>response_status</strong> (<em>Optional</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><em>int</em></a><em>]</em>) – The HTTP status code of the received response.</p></li>
+<li><p><strong>response_headers</strong> (<em>Optional</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>]</em>) – The headers received in the response.</p></li>
+<li><p><strong>_response</strong> (<em>Optional</em><em>[</em><em>Union</em><em>[</em><em>Dict</em><em>[</em><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em>, </em><em>Any</em><em>]</em><em>, </em><em>Response</em><em>]</em><em>]</em>) – Private attribute storing
+either the raw <cite>httpx.Response</cite> object initially, or the processed JSON
+dictionary after the <cite>response</cite> property is accessed or set.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py class">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.Config">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">Config</span></span><a class="reference internal" href="../_modules/schemas/request_schemas.html#RequestData.Config"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#schemas.request_schemas.RequestData.Config" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/functions.html#object" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">object</span></code></a></p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.Config.arbitrary_types_allowed">
+<span class="sig-name descname"><span class="pre">arbitrary_types_allowed</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">True</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.Config.arbitrary_types_allowed" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.headers">
+<span class="sig-name descname"><span class="pre">headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.headers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.method">
+<span class="sig-name descname"><span class="pre">method</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.RequestData.method" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{'arbitrary_types_allowed':</span> <span class="pre">True}</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">context</span></span></em>, <em class="sig-param"><span class="positional-only-separator o"><abbr title="Positional-only parameter separator (PEP 570)"><span class="pre">/</span></abbr></span></em><span class="sig-paren">)</span><a class="headerlink" href="#schemas.request_schemas.RequestData.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>This function is meant to behave like a BaseModel method to initialise private attributes.</p>
+<p>It takes context as an argument since that’s what pydantic-core passes when calling it.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>self</strong> (<span class="sphinx_autodoc_typehints-type"><code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></span>) – The BaseModel instance.</p></li>
+<li><p><strong>context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>) – The context.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.payload">
+<span class="sig-name descname"><span class="pre">payload</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.payload" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.response">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">response</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><span class="pre">Dict</span></a><span class="p"><span class="pre">[</span></span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><span class="pre">str</span></a><span class="p"><span class="pre">,</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><span class="pre">Any</span></a><span class="p"><span class="pre">]</span></span><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><span class="pre">None</span></a></em><a class="headerlink" href="#schemas.request_schemas.RequestData.response" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the processed response body as a dictionary.</p>
+<p>If the internal <cite>_response</cite> is still an <cite>httpx.Response</cite> object
+(meaning it hasn’t been processed yet), this property access triggers
+the processing (<cite>_process_assigned_response</cite>) to extract the status code,
+headers, and JSON body. It then returns the processed dictionary body.
+If processing fails or the response was already None, returns None.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Devuelve<span class="colon">:</span></dt>
+<dd class="field-odd"><p><dl class="simple">
+<dt>The JSON response body as a dictionary,</dt><dd><p>or None if processing failed or no response exists.</p>
+</dd>
+</dl>
+</p>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p>Optional[Dict[<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)">str</a>, Any]]</p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.response_headers">
+<span class="sig-name descname"><span class="pre">response_headers</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Dict" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Dict</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a><span class="pre">,</span> <a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a><span class="pre">]]</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.response_headers" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.response_status">
+<span class="sig-name descname"><span class="pre">response_status</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Optional" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Optional</span></code></a><span class="pre">[</span><a class="reference external" href="https://docs.python.org/3/library/functions.html#int" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">int</span></code></a><span class="pre">]</span></em><a class="headerlink" href="#schemas.request_schemas.RequestData.response_status" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py property">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.response_text">
+<em class="property"><span class="k"><span class="pre">property</span></span><span class="w"> </span></em><span class="sig-name descname"><span class="pre">response_text</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><span class="pre">str</span></a><span class="w"> </span><span class="p"><span class="pre">|</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><span class="pre">None</span></a></em><a class="headerlink" href="#schemas.request_schemas.RequestData.response_text" title="Link to this definition"></a></dt>
+<dd><p>Provides access to the raw response text if available.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="schemas.request_schemas.RequestData.url">
+<span class="sig-name descname"><span class="pre">url</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#schemas.request_schemas.RequestData.url" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="endpoint_map.html" class="btn btn-neutral float-left" title="Mapa de Endpoints (endpoint_map)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="validation_schemas.html" class="btn btn-neutral float-right" title="Esquemas de Validación (validation_schemas)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

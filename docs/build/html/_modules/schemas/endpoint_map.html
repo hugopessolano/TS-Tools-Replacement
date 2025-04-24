@@ -1,0 +1,471 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="../../">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>schemas.endpoint_map &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="../../_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="../../_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="../../_static/jquery.js?v=5d32c60e"></script>
+      <script src="../../_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="../../_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="../../_static/doctools.js?v=9bcbadda"></script>
+      <script src="../../_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="../../_static/translations.js?v=f85f4cfb"></script>
+    <script src="../../_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="../../genindex.html" />
+    <link rel="search" title="Búsqueda" href="../../search.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="../../index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="../../search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul>
+<li class="toctree-l1"><a class="reference internal" href="../../dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../logger_settings.html">Configuraciones del Logger (<cite>logger_settings</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="../../schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="../../index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="../../index.html" class="icon icon-home" aria-label="Home"></a></li>
+          <li class="breadcrumb-item"><a href="../index.html">Código de módulo</a></li>
+      <li class="breadcrumb-item active">schemas.endpoint_map</li>
+      <li class="wy-breadcrumbs-aside">
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <h1>Código fuente para schemas.endpoint_map</h1><div class="highlight"><pre>
+<span></span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">Defines models and functions to build a structured map of API endpoints.</span>
+
+<span class="sd">This module parses a list of endpoint path strings (from `endpoint_config`)</span>
+<span class="sd">and organizes them into a hierarchical structure (`EndpointMap`) using nested</span>
+<span class="sd">`EndpointGroup` objects. Each endpoint path is represented by an `Endpoint`</span>
+<span class="sd">object, which stores the path, counts positional arguments, and links to an</span>
+<span class="sd">optional Pydantic validation model based on naming conventions.</span>
+<span class="sd">&quot;&quot;&quot;</span>
+
+<span class="kn">import</span><span class="w"> </span><span class="nn">re</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">typing</span><span class="w"> </span><span class="kn">import</span> <span class="n">Dict</span><span class="p">,</span> <span class="n">Optional</span><span class="p">,</span> <span class="n">List</span><span class="p">,</span> <span class="n">Type</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">pydantic</span><span class="w"> </span><span class="kn">import</span> <span class="n">BaseModel</span><span class="p">,</span> <span class="n">RootModel</span><span class="p">,</span> <span class="n">Field</span>
+
+<span class="c1"># Attempt to import from schemas package first, fallback for direct execution</span>
+<span class="k">try</span><span class="p">:</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">schemas.endpoint_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS_LIST</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">schemas.validation_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationModel</span><span class="p">,</span> <span class="n">validation_class_map</span>
+<span class="k">except</span> <span class="ne">ImportError</span><span class="p">:</span>
+    <span class="c1"># Fallback imports if running the script directly or from a different context</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">endpoint_config</span><span class="w"> </span><span class="kn">import</span> <span class="n">ENDPOINTS_LIST</span>
+    <span class="kn">from</span><span class="w"> </span><span class="nn">validation_schemas</span><span class="w"> </span><span class="kn">import</span> <span class="n">ValidationModel</span><span class="p">,</span> <span class="n">validation_class_map</span>
+
+<span class="c1"># --- Pydantic Models for Endpoint Structure ---</span>
+
+<div class="viewcode-block" id="Endpoint">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.Endpoint">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">Endpoint</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a single API endpoint configuration.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        path (str): The raw endpoint path string (e.g., &quot;/products/{arg_1}/variants&quot;).</span>
+<span class="sd">        positional_arguments_count (int): The number of positional arguments</span>
+<span class="sd">                                          (placeholders like {arg_n}) found in the path.</span>
+<span class="sd">        validation_model (Optional[Type[ValidationModel]]): The Pydantic model associated</span>
+<span class="sd">                                                            with this endpoint for request/response</span>
+<span class="sd">                                                            validation, if applicable. Determined</span>
+<span class="sd">                                                            based on the endpoint&#39;s resource name.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">path</span><span class="p">:</span> <span class="nb">str</span>
+    <span class="n">positional_arguments_count</span><span class="p">:</span> <span class="nb">int</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">validation_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">ValidationModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span>
+
+<div class="viewcode-block" id="Endpoint.path_with_positional_args">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.Endpoint.path_with_positional_args">[documentos]</a>
+    <span class="k">def</span><span class="w"> </span><span class="nf">path_with_positional_args</span><span class="p">(</span><span class="bp">self</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">str</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        DEPRECATED/UNUSED? Replaces named placeholders with indexed placeholders.</span>
+
+<span class="sd">        Example: &quot;/products/{product_id}/variants&quot; -&gt; &quot;/products/{arg_1}/variants&quot;</span>
+<span class="sd">        Note: The current implementation seems to use indexed placeholders directly.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            str: The path string with placeholders potentially renamed.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="n">replaced</span> <span class="o">=</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span>
+        <span class="c1"># Find all placeholders like {placeholder_name}</span>
+        <span class="n">matches</span> <span class="o">=</span> <span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;{(.*?)}&quot;</span><span class="p">,</span> <span class="bp">self</span><span class="o">.</span><span class="n">path</span><span class="p">)</span>
+        <span class="c1"># Replace them sequentially with {arg_1}, {arg_2}, ...</span>
+        <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">param</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">matches</span><span class="p">,</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+            <span class="n">replaced</span> <span class="o">=</span> <span class="n">replaced</span><span class="o">.</span><span class="n">replace</span><span class="p">(</span><span class="s2">&quot;{&quot;</span> <span class="o">+</span> <span class="n">param</span> <span class="o">+</span> <span class="s2">&quot;}&quot;</span><span class="p">,</span> <span class="sa">f</span><span class="s2">&quot;</span><span class="se">{{</span><span class="s2">arg_</span><span class="si">{</span><span class="n">i</span><span class="si">}</span><span class="se">}}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="k">return</span> <span class="n">replaced</span></div>
+
+
+<div class="viewcode-block" id="Endpoint.Config">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.Endpoint.Config">[documentos]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+        <span class="c1"># Allow Pydantic models (like ValidationModel types) as field types</span>
+        <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+
+<div class="viewcode-block" id="EndpointGroup">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.EndpointGroup">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EndpointGroup</span><span class="p">(</span><span class="n">BaseModel</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Represents a group of related endpoints, often corresponding to a resource.</span>
+
+<span class="sd">    Endpoints are typically categorized as &#39;all&#39; (listing/creating the resource collection)</span>
+<span class="sd">    or &#39;single&#39; (accessing/modifying a specific resource instance). Nested resources</span>
+<span class="sd">    are represented by child `EndpointGroup` objects.</span>
+
+<span class="sd">    Attributes:</span>
+<span class="sd">        all (Optional[Endpoint]): The endpoint for the collection resource</span>
+<span class="sd">                                  (e.g., GET /products, POST /products).</span>
+<span class="sd">        single (Optional[Endpoint]): The endpoint for a single resource instance</span>
+<span class="sd">                                     (e.g., GET /products/{id}, PUT /products/{id}).</span>
+<span class="sd">        children (Dict[str, &quot;EndpointGroup&quot;]): A dictionary mapping nested resource names</span>
+<span class="sd">                                               to their corresponding `EndpointGroup`.</span>
+<span class="sd">                                               Uses a forward reference string due to self-reference.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">all</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="n">single</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">]</span> <span class="o">=</span> <span class="kc">None</span>
+    <span class="c1"># Use Field to initialize empty dict for children, avoiding shared mutable default</span>
+    <span class="n">children</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="s2">&quot;EndpointGroup&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">Field</span><span class="p">(</span><span class="n">default_factory</span><span class="o">=</span><span class="nb">dict</span><span class="p">)</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="s2">&quot;EndpointGroup&quot;</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows accessing child endpoint groups using attribute syntax.</span>
+
+<span class="sd">        Example: `endpoint_map.products.variants` instead of `endpoint_map.products.children[&quot;variants&quot;]`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item (str): The name of the child group attribute.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            EndpointGroup: The corresponding child EndpointGroup.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If the item does not correspond to a child group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">children</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="c1"># Raise standard AttributeError if the child doesn&#39;t exist</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;</span><span class="si">{</span><span class="bp">self</span><span class="o">.</span><span class="vm">__class__</span><span class="o">.</span><span class="vm">__name__</span><span class="si">}</span><span class="s2">&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span>
+
+<div class="viewcode-block" id="EndpointGroup.Config">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.EndpointGroup.Config">[documentos]</a>
+    <span class="k">class</span><span class="w"> </span><span class="nc">Config</span><span class="p">:</span>
+        <span class="c1"># Allow Pydantic models (like Endpoint) as field types</span>
+        <span class="n">arbitrary_types_allowed</span> <span class="o">=</span> <span class="kc">True</span></div>
+</div>
+
+
+<span class="c1"># Explicitly rebuild the model to resolve the forward reference in &#39;children&#39;</span>
+<span class="c1"># This is necessary in Pydantic v2 when using forward references within the same module.</span>
+<span class="n">EndpointGroup</span><span class="o">.</span><span class="n">model_rebuild</span><span class="p">()</span>
+
+<div class="viewcode-block" id="EndpointMap">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.EndpointMap">[documentos]</a>
+<span class="k">class</span><span class="w"> </span><span class="nc">EndpointMap</span><span class="p">(</span><span class="n">RootModel</span><span class="p">[</span><span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EndpointGroup</span><span class="p">]]):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    The main container for the entire endpoint map structure.</span>
+
+<span class="sd">    Uses Pydantic&#39;s `RootModel` to represent a dictionary where keys are</span>
+<span class="sd">    top-level resource names (e.g., &quot;products&quot;, &quot;orders&quot;) and values are</span>
+<span class="sd">    their corresponding `EndpointGroup` objects. Provides attribute access</span>
+<span class="sd">    to these top-level groups.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">root</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">EndpointGroup</span><span class="p">]</span> <span class="c1"># Explicitly define the root type</span>
+
+    <span class="k">def</span><span class="w"> </span><span class="fm">__getattr__</span><span class="p">(</span><span class="bp">self</span><span class="p">,</span> <span class="n">item</span><span class="p">:</span> <span class="nb">str</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EndpointGroup</span><span class="p">:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">        Allows accessing top-level endpoint groups using attribute syntax.</span>
+
+<span class="sd">        Example: `endpoint_map.products` instead of `endpoint_map.root[&quot;products&quot;]`.</span>
+
+<span class="sd">        Args:</span>
+<span class="sd">            item (str): The name of the top-level resource group attribute.</span>
+
+<span class="sd">        Returns:</span>
+<span class="sd">            EndpointGroup: The corresponding top-level EndpointGroup.</span>
+
+<span class="sd">        Raises:</span>
+<span class="sd">            AttributeError: If the item does not correspond to a top-level group.</span>
+<span class="sd">        &quot;&quot;&quot;</span>
+        <span class="c1"># Access the underlying dictionary stored in self.root</span>
+        <span class="k">if</span> <span class="n">item</span> <span class="ow">in</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">:</span>
+            <span class="k">return</span> <span class="bp">self</span><span class="o">.</span><span class="n">root</span><span class="p">[</span><span class="n">item</span><span class="p">]</span>
+        <span class="c1"># Raise standard AttributeError if the group doesn&#39;t exist</span>
+        <span class="k">raise</span> <span class="ne">AttributeError</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;&#39;EndpointMap&#39; object has no attribute &#39;</span><span class="si">{</span><span class="n">item</span><span class="si">}</span><span class="s2">&#39;&quot;</span><span class="p">)</span></div>
+
+
+<span class="c1"># --- Builder Functions ---</span>
+
+<div class="viewcode-block" id="build_tree_corrected">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.build_tree_corrected">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_tree_corrected</span><span class="p">(</span><span class="n">endpoints</span><span class="p">:</span> <span class="n">List</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Builds a nested dictionary representation (tree) from a flat list of endpoint paths.</span>
+
+<span class="sd">    Parses each path string, splitting it into segments. It organizes these segments</span>
+<span class="sd">    into a hierarchical dictionary structure, distinguishing between collection endpoints (&#39;all&#39;)</span>
+<span class="sd">    and single instance endpoints (&#39;single&#39;) based on path structure and the presence</span>
+<span class="sd">    of trailing path parameters.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        endpoints (List[str]): A list of endpoint path strings (e.g., from `ENDPOINTS_LIST`).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        Dict[str, Dict]: A nested dictionary representing the endpoint hierarchy.</span>
+<span class="sd">                         Each node has keys &quot;all&quot;, &quot;single&quot;, and &quot;children&quot;.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="n">tree</span><span class="p">:</span> <span class="n">Dict</span><span class="p">[</span><span class="nb">str</span><span class="p">,</span> <span class="n">Dict</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">ep</span> <span class="ow">in</span> <span class="n">endpoints</span><span class="p">:</span>
+        <span class="c1"># Split path by &#39;/&#39; and remove empty segments (e.g., leading/trailing slashes)</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">seg</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">ep</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">seg</span><span class="p">]</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">segments</span><span class="p">:</span>
+            <span class="k">continue</span> <span class="c1"># Skip empty paths</span>
+
+        <span class="c1"># The first segment defines the root resource group</span>
+        <span class="n">root_segment</span> <span class="o">=</span> <span class="n">segments</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">root_segment</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">tree</span><span class="p">:</span>
+            <span class="c1"># Initialize the root group if it doesn&#39;t exist</span>
+            <span class="n">tree</span><span class="p">[</span><span class="n">root_segment</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+
+        <span class="n">current_node</span> <span class="o">=</span> <span class="n">tree</span><span class="p">[</span><span class="n">root_segment</span><span class="p">]</span>
+
+        <span class="c1"># Determine endpoint type based on segment count and structure</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">1</span><span class="p">:</span>
+            <span class="c1"># Path like &quot;/products&quot; -&gt; &#39;all&#39; endpoint of the root group</span>
+            <span class="n">current_node</span><span class="p">[</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ep</span>
+        <span class="k">elif</span> <span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span> <span class="o">==</span> <span class="mi">2</span> <span class="ow">and</span> <span class="n">segments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">segments</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">):</span>
+            <span class="c1"># Path like &quot;/products/{arg_1}&quot; -&gt; &#39;single&#39; endpoint of the root group</span>
+            <span class="n">current_node</span><span class="p">[</span><span class="s2">&quot;single&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ep</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="c1"># Handle nested paths (more than 2 segments or 2 segments without trailing param)</span>
+            <span class="c1"># Traverse or create nodes for literal segments (non-parameters)</span>
+            <span class="c1"># Start from the second segment (index 1) as the first is the root group key</span>
+            <span class="n">path_cursor</span> <span class="o">=</span> <span class="n">current_node</span>
+            <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">seg</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">segments</span><span class="p">[</span><span class="mi">1</span><span class="p">:],</span> <span class="n">start</span><span class="o">=</span><span class="mi">1</span><span class="p">):</span>
+                <span class="n">is_last_segment</span> <span class="o">=</span> <span class="p">(</span><span class="n">i</span> <span class="o">==</span> <span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span> <span class="o">-</span> <span class="mi">1</span><span class="p">)</span>
+                <span class="n">is_parameter</span> <span class="o">=</span> <span class="n">seg</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">seg</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">is_last_segment</span><span class="p">:</span>
+                    <span class="c1"># Handle the final segment</span>
+                    <span class="k">if</span> <span class="n">is_parameter</span><span class="p">:</span>
+                        <span class="c1"># Final segment is parameter (e.g., /res/{id}) -&gt; &#39;single&#39; of current node</span>
+                        <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;single&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ep</span>
+                    <span class="k">else</span><span class="p">:</span>
+                        <span class="c1"># Final segment is literal (e.g., /res/action) -&gt; &#39;all&#39; of a new child node</span>
+                        <span class="k">if</span> <span class="n">seg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]:</span>
+                            <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">seg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+                        <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">seg</span><span class="p">][</span><span class="s2">&quot;all&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">ep</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="c1"># Handle intermediate segments</span>
+                    <span class="k">if</span> <span class="ow">not</span> <span class="n">is_parameter</span><span class="p">:</span>
+                        <span class="c1"># Intermediate literal segment -&gt; traverse/create child node</span>
+                        <span class="k">if</span> <span class="n">seg</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">]:</span>
+                            <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">seg</span><span class="p">]</span> <span class="o">=</span> <span class="p">{</span><span class="s2">&quot;all&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;single&quot;</span><span class="p">:</span> <span class="kc">None</span><span class="p">,</span> <span class="s2">&quot;children&quot;</span><span class="p">:</span> <span class="p">{}}</span>
+                        <span class="n">path_cursor</span> <span class="o">=</span> <span class="n">path_cursor</span><span class="p">[</span><span class="s2">&quot;children&quot;</span><span class="p">][</span><span class="n">seg</span><span class="p">]</span>
+                    <span class="c1"># else: Intermediate parameter segment -&gt; skip creating a node for the parameter itself</span>
+
+    <span class="k">return</span> <span class="n">tree</span></div>
+
+
+
+<div class="viewcode-block" id="tree_to_endpoint_group">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.tree_to_endpoint_group">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">tree_to_endpoint_group</span><span class="p">(</span><span class="n">tree_node</span><span class="p">:</span> <span class="n">Dict</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">EndpointGroup</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Recursively transforms a dictionary tree node into an `EndpointGroup` object.</span>
+
+<span class="sd">    Converts the string paths stored in the tree (&#39;all&#39;, &#39;single&#39;) into `Endpoint`</span>
+<span class="sd">    objects, calculating argument counts and attempting to map validation models.</span>
+<span class="sd">    Recursively calls itself for child nodes.</span>
+
+<span class="sd">    Args:</span>
+<span class="sd">        tree_node (Dict): A dictionary node from the tree built by `build_tree_corrected`.</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        EndpointGroup: The corresponding `EndpointGroup` object with nested children.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="k">def</span><span class="w"> </span><span class="nf">make_endpoint</span><span class="p">(</span><span class="n">ep_path</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="nb">str</span><span class="p">])</span> <span class="o">-&gt;</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Endpoint</span><span class="p">]:</span>
+<span class="w">        </span><span class="sd">&quot;&quot;&quot;Helper function to create an Endpoint object from a path string.&quot;&quot;&quot;</span>
+        <span class="k">if</span> <span class="n">ep_path</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">None</span>
+
+        <span class="c1"># Count positional arguments ({arg_n})</span>
+        <span class="n">count</span> <span class="o">=</span> <span class="nb">len</span><span class="p">(</span><span class="n">re</span><span class="o">.</span><span class="n">findall</span><span class="p">(</span><span class="sa">r</span><span class="s2">&quot;{(.*?)}&quot;</span><span class="p">,</span> <span class="n">ep_path</span><span class="p">))</span>
+        <span class="n">validation_model</span><span class="p">:</span> <span class="n">Optional</span><span class="p">[</span><span class="n">Type</span><span class="p">[</span><span class="n">ValidationModel</span><span class="p">]]</span> <span class="o">=</span> <span class="kc">None</span> <span class="c1"># Default to no model</span>
+
+        <span class="c1"># --- Logic to find associated validation model ---</span>
+        <span class="c1"># Split path and filter empty segments</span>
+        <span class="n">segments</span> <span class="o">=</span> <span class="p">[</span><span class="n">seg</span> <span class="k">for</span> <span class="n">seg</span> <span class="ow">in</span> <span class="n">ep_path</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot;/&quot;</span><span class="p">)</span> <span class="k">if</span> <span class="n">seg</span><span class="p">]</span>
+        <span class="k">if</span> <span class="n">segments</span><span class="p">:</span>
+            <span class="c1"># Determine the key segment for model lookup:</span>
+            <span class="c1"># - Usually the last segment if it&#39;s a literal (e.g., &quot;variants&quot;, &quot;images&quot;)</span>
+            <span class="c1"># - If the last segment is a parameter (e.g., &quot;{arg_2}&quot;), use the second-to-last segment.</span>
+            <span class="n">lookup_segment</span> <span class="o">=</span> <span class="n">segments</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span>
+            <span class="k">if</span> <span class="n">lookup_segment</span><span class="o">.</span><span class="n">startswith</span><span class="p">(</span><span class="s2">&quot;{&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="n">lookup_segment</span><span class="o">.</span><span class="n">endswith</span><span class="p">(</span><span class="s2">&quot;}&quot;</span><span class="p">)</span> <span class="ow">and</span> <span class="nb">len</span><span class="p">(</span><span class="n">segments</span><span class="p">)</span> <span class="o">&gt;</span> <span class="mi">1</span><span class="p">:</span>
+                <span class="n">lookup_segment</span> <span class="o">=</span> <span class="n">segments</span><span class="p">[</span><span class="o">-</span><span class="mi">2</span><span class="p">]</span> <span class="c1"># Use parent resource name</span>
+
+            <span class="c1"># Convert to lowercase for case-insensitive matching in the map</span>
+            <span class="n">lookup_key</span> <span class="o">=</span> <span class="n">lookup_segment</span><span class="o">.</span><span class="n">lower</span><span class="p">()</span>
+            <span class="c1"># Get the validation model type from the predefined map</span>
+            <span class="n">validation_model</span> <span class="o">=</span> <span class="n">validation_class_map</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="n">lookup_key</span><span class="p">)</span>
+            <span class="c1"># if validation_model:</span>
+            <span class="c1">#     print(f&quot;Mapped path &#39;{ep_path}&#39; (key: &#39;{lookup_key}&#39;) to model: {validation_model.__name__}&quot;)</span>
+            <span class="c1"># else:</span>
+            <span class="c1">#     print(f&quot;No validation model found for path &#39;{ep_path}&#39; (key: &#39;{lookup_key}&#39;)&quot;)</span>
+
+
+        <span class="k">return</span> <span class="n">Endpoint</span><span class="p">(</span>
+            <span class="n">path</span><span class="o">=</span><span class="n">ep_path</span><span class="p">,</span>
+            <span class="n">positional_arguments_count</span><span class="o">=</span><span class="n">count</span><span class="p">,</span>
+            <span class="n">validation_model</span><span class="o">=</span><span class="n">validation_model</span>
+        <span class="p">)</span>
+
+    <span class="c1"># Create the EndpointGroup, recursively processing children</span>
+    <span class="n">group</span> <span class="o">=</span> <span class="n">EndpointGroup</span><span class="p">(</span>
+        <span class="nb">all</span><span class="o">=</span><span class="n">make_endpoint</span><span class="p">(</span><span class="n">tree_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;all&quot;</span><span class="p">)),</span> <span class="c1"># Use .get for safety</span>
+        <span class="n">single</span><span class="o">=</span><span class="n">make_endpoint</span><span class="p">(</span><span class="n">tree_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;single&quot;</span><span class="p">)),</span>
+        <span class="c1"># Recursively convert child dictionaries to EndpointGroup objects</span>
+        <span class="n">children</span><span class="o">=</span><span class="p">{</span><span class="n">k</span><span class="p">:</span> <span class="n">tree_to_endpoint_group</span><span class="p">(</span><span class="n">v</span><span class="p">)</span> <span class="k">for</span> <span class="n">k</span><span class="p">,</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">tree_node</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;children&quot;</span><span class="p">,</span> <span class="p">{})</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">group</span></div>
+
+
+<div class="viewcode-block" id="build_endpoint_map">
+<a class="viewcode-back" href="../../schemas/endpoint_map.html#schemas.endpoint_map.build_endpoint_map">[documentos]</a>
+<span class="k">def</span><span class="w"> </span><span class="nf">build_endpoint_map</span><span class="p">()</span> <span class="o">-&gt;</span> <span class="n">EndpointMap</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Constructs the complete, structured `EndpointMap` from the configuration list.</span>
+
+<span class="sd">    Orchestrates the process:</span>
+<span class="sd">    1. Builds the intermediate dictionary tree using `build_tree_corrected`.</span>
+<span class="sd">    2. Transforms the tree into nested `EndpointGroup` objects using `tree_to_endpoint_group`.</span>
+<span class="sd">    3. Validates and wraps the result in an `EndpointMap` (RootModel).</span>
+
+<span class="sd">    Returns:</span>
+<span class="sd">        EndpointMap: The fully constructed and validated endpoint map object.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="c1"># 1. Build the raw dictionary tree from the flat list</span>
+    <span class="n">tree</span> <span class="o">=</span> <span class="n">build_tree_corrected</span><span class="p">(</span><span class="n">ENDPOINTS_LIST</span><span class="p">)</span>
+
+    <span class="c1"># 2. Transform the tree structure into Pydantic models (EndpointGroup)</span>
+    <span class="n">root_groups</span> <span class="o">=</span> <span class="p">{</span><span class="n">resource</span><span class="p">:</span> <span class="n">tree_to_endpoint_group</span><span class="p">(</span><span class="n">node</span><span class="p">)</span> <span class="k">for</span> <span class="n">resource</span><span class="p">,</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">tree</span><span class="o">.</span><span class="n">items</span><span class="p">()}</span>
+
+    <span class="c1"># 3. Create and validate the final EndpointMap using the root groups dictionary</span>
+    <span class="n">endpoint_map</span><span class="p">:</span> <span class="n">EndpointMap</span> <span class="o">=</span> <span class="n">EndpointMap</span><span class="o">.</span><span class="n">model_validate</span><span class="p">(</span><span class="n">root_groups</span><span class="p">)</span>
+    <span class="k">return</span> <span class="n">endpoint_map</span></div>
+
+
+
+<span class="c1"># --- Example Usage ---</span>
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s1">&#39;__main__&#39;</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;</span>
+<span class="sd">    Example block demonstrating the creation and potential inspection of the endpoint map.</span>
+<span class="sd">    This only runs when the script is executed directly.</span>
+<span class="sd">    &quot;&quot;&quot;</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Building Endpoint Map...&quot;</span><span class="p">)</span>
+    <span class="n">endpoint_map</span> <span class="o">=</span> <span class="n">build_endpoint_map</span><span class="p">()</span>
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Endpoint Map built successfully.&quot;</span><span class="p">)</span>
+
+    <span class="c1"># Example: Accessing specific endpoints and their validation models</span>
+    <span class="k">try</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Example Access:&quot;</span><span class="p">)</span>
+        <span class="n">product_endpoint</span> <span class="o">=</span> <span class="n">endpoint_map</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">single</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Products Single Path: </span><span class="si">{</span><span class="n">product_endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Products Single Args: </span><span class="si">{</span><span class="n">product_endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Products Single Model: </span><span class="si">{</span><span class="n">product_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">product_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">variant_endpoint</span> <span class="o">=</span> <span class="n">endpoint_map</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">variants</span><span class="o">.</span><span class="n">single</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Variant Single Path: </span><span class="si">{</span><span class="n">variant_endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Variant Single Args: </span><span class="si">{</span><span class="n">variant_endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Variant Single Model: </span><span class="si">{</span><span class="n">variant_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">variant_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">image_endpoint</span> <span class="o">=</span> <span class="n">endpoint_map</span><span class="o">.</span><span class="n">products</span><span class="o">.</span><span class="n">images</span><span class="o">.</span><span class="n">single</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Image Single Path: </span><span class="si">{</span><span class="n">image_endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Image Single Args: </span><span class="si">{</span><span class="n">image_endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Image Single Model: </span><span class="si">{</span><span class="n">image_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">image_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+        <span class="n">order_endpoint</span> <span class="o">=</span> <span class="n">endpoint_map</span><span class="o">.</span><span class="n">orders</span><span class="o">.</span><span class="n">single</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Order Single Path: </span><span class="si">{</span><span class="n">order_endpoint</span><span class="o">.</span><span class="n">path</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Order Single Args: </span><span class="si">{</span><span class="n">order_endpoint</span><span class="o">.</span><span class="n">positional_arguments_count</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;- Order Single Model: </span><span class="si">{</span><span class="n">order_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="o">.</span><span class="vm">__name__</span><span class="w"> </span><span class="k">if</span><span class="w"> </span><span class="n">order_endpoint</span><span class="o">.</span><span class="n">validation_model</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="s1">&#39;None&#39;</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">except</span> <span class="ne">AttributeError</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="se">\n</span><span class="s2">Error accessing example endpoint: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s1">&#39;</span><span class="se">\n</span><span class="s1">Script finished.&#39;</span><span class="p">)</span>
+</pre></div>
+
+           </div>
+          </div>
+          <footer>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>

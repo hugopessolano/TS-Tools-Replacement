@@ -1,0 +1,332 @@
+
+
+<!DOCTYPE html>
+<html class="writer-html5" lang="es" data-content_root="./">
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Configuraciones del Logger (logger_settings) &mdash; documentación de TS-tools-replacement - 0.1.0</title>
+      <link rel="stylesheet" type="text/css" href="_static/pygments.css?v=b86133f3" />
+      <link rel="stylesheet" type="text/css" href="_static/css/theme.css?v=e59714d7" />
+
+  
+      <script src="_static/jquery.js?v=5d32c60e"></script>
+      <script src="_static/_sphinx_javascript_frameworks_compat.js?v=2cd50e6c"></script>
+      <script src="_static/documentation_options.js?v=ba61de6b"></script>
+      <script src="_static/doctools.js?v=9bcbadda"></script>
+      <script src="_static/sphinx_highlight.js?v=dc90522c"></script>
+      <script src="_static/translations.js?v=f85f4cfb"></script>
+    <script src="_static/js/theme.js"></script>
+    <link rel="index" title="Índice" href="genindex.html" />
+    <link rel="search" title="Búsqueda" href="search.html" />
+    <link rel="next" title="Esquemas de Rate Limit (rate_limit_schemas)" href="rate_limit_schemas.html" />
+    <link rel="prev" title="Configuración de Logging (log_db)" href="log_db.html" /> 
+</head>
+
+<body class="wy-body-for-nav"> 
+  <div class="wy-grid-for-nav">
+    <nav data-toggle="wy-nav-shift" class="wy-nav-side">
+      <div class="wy-side-scroll">
+        <div class="wy-side-nav-search" >
+
+          
+          
+          <a href="index.html" class="icon icon-home">
+            TS-tools-replacement
+          </a>
+<div role="search">
+  <form id="rtd-search-form" class="wy-form" action="search.html" method="get">
+    <input type="text" name="q" placeholder="Buscar documentos" aria-label="Buscar documentos" />
+    <input type="hidden" name="check_keywords" value="yes" />
+    <input type="hidden" name="area" value="default" />
+  </form>
+</div>
+        </div><div class="wy-menu wy-menu-vertical" data-spy="affix" role="navigation" aria-label="Navigation menu">
+              <p class="caption" role="heading"><span class="caption-text">Contenidos:</span></p>
+<ul class="current">
+<li class="toctree-l1"><a class="reference internal" href="dataframe_manager.html">Gestor de DataFrames (<cite>dataframe_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="dataframe_utils.html">Utilidades de DataFrame (<cite>dataframe_utils</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="request_manager.html">Gestor de Peticiones (<cite>request_manager</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="log_db.html">Configuración de Logging (<cite>log_db</cite>)</a></li>
+<li class="toctree-l1 current"><a class="current reference internal" href="#">Configuraciones del Logger (<cite>logger_settings</cite>)</a><ul>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.DB_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.DB_ONLY_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_ONLY_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.DB_STDOUT_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">DB_STDOUT_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.LogLevel"><code class="docutils literal notranslate"><span class="pre">LogLevel</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.CRITICAL"><code class="docutils literal notranslate"><span class="pre">LogLevel.CRITICAL</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.DEBUG"><code class="docutils literal notranslate"><span class="pre">LogLevel.DEBUG</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.ERROR"><code class="docutils literal notranslate"><span class="pre">LogLevel.ERROR</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.INFO"><code class="docutils literal notranslate"><span class="pre">LogLevel.INFO</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.SUCCESS"><code class="docutils literal notranslate"><span class="pre">LogLevel.SUCCESS</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.TRACE"><code class="docutils literal notranslate"><span class="pre">LogLevel.TRACE</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LogLevel.WARNING"><code class="docutils literal notranslate"><span class="pre">LogLevel.WARNING</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.LoggerSettings"><code class="docutils literal notranslate"><span class="pre">LoggerSettings</span></code></a><ul>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.catch"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.catch</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.colorize"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.colorize</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.denomination"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.denomination</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.format"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.format</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.level"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.level</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.model_config"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.model_config</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.model_post_init"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.model_post_init()</span></code></a></li>
+<li class="toctree-l3"><a class="reference internal" href="#logger_settings.LoggerSettings.serialize"><code class="docutils literal notranslate"><span class="pre">LoggerSettings.serialize</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.STDOUT_LOGGER_SETTINGS"><code class="docutils literal notranslate"><span class="pre">STDOUT_LOGGER_SETTINGS</span></code></a></li>
+<li class="toctree-l2"><a class="reference internal" href="#logger_settings.format_assigner"><code class="docutils literal notranslate"><span class="pre">format_assigner()</span></code></a></li>
+</ul>
+</li>
+<li class="toctree-l1"><a class="reference internal" href="rate_limit_schemas.html">Esquemas de Rate Limit (<cite>rate_limit_schemas</cite>)</a></li>
+<li class="toctree-l1"><a class="reference internal" href="schemas/index.html">Esquemas (<cite>schemas</cite>)</a></li>
+</ul>
+
+        </div>
+      </div>
+    </nav>
+
+    <section data-toggle="wy-nav-shift" class="wy-nav-content-wrap"><nav class="wy-nav-top" aria-label="Mobile navigation menu" >
+          <i data-toggle="wy-nav-top" class="fa fa-bars"></i>
+          <a href="index.html">TS-tools-replacement</a>
+      </nav>
+
+      <div class="wy-nav-content">
+        <div class="rst-content">
+          <div role="navigation" aria-label="Page navigation">
+  <ul class="wy-breadcrumbs">
+      <li><a href="index.html" class="icon icon-home" aria-label="Home"></a></li>
+      <li class="breadcrumb-item active">Configuraciones del Logger (<cite>logger_settings</cite>)</li>
+      <li class="wy-breadcrumbs-aside">
+            <a href="_sources/logger_settings.rst.txt" rel="nofollow"> Ver código fuente de la página</a>
+      </li>
+  </ul>
+  <hr/>
+</div>
+          <div role="main" class="document" itemscope="itemscope" itemtype="http://schema.org/Article">
+           <div itemprop="articleBody">
+             
+  <section id="configuraciones-del-logger-logger-settings">
+<h1>Configuraciones del Logger (<cite>logger_settings</cite>)<a class="headerlink" href="#configuraciones-del-logger-logger-settings" title="Link to this heading"></a></h1>
+<p id="module-logger_settings">Defines settings and configurations for the Loguru logger.</p>
+<p>This module includes:
+- An enumeration (<cite>LogLevel</cite>) for standard logging levels.
+- A function (<cite>format_assigner</cite>) to generate formatted strings for log messages.
+- A Pydantic model (<cite>LoggerSettings</cite>) to structure logger configurations.
+- Predefined instances of <cite>LoggerSettings</cite> for different logging scenarios</p>
+<blockquote>
+<div><p>(e.g., stdout only, database only, both).</p>
+</div></blockquote>
+<dl class="py data">
+<dt class="sig sig-object py" id="logger_settings.DB_LOGGER_SETTINGS">
+<span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">DB_LOGGER_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoggerSettings(denomination='DB+OUT',</span> <span class="pre">level='INFO',</span> <span class="pre">format='&lt;fg</span> <span class="pre">#808080&gt;{time:YYYY/MM/DD</span> <span class="pre">HH:mm:ss}&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;fg</span> <span class="pre">#FFD700&gt;DB+OUT&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;level&gt;{level:</span> <span class="pre">&lt;8}&lt;/level&gt;</span> <span class="pre">|</span> <span class="pre">&lt;cyan&gt;{name}:{function}:{line}&lt;/cyan&gt;</span> <span class="pre">-</span> <span class="pre">&lt;level&gt;{message}&lt;/level&gt;',</span> <span class="pre">colorize=False,</span> <span class="pre">serialize=True,</span> <span class="pre">catch=True)</span></em><a class="headerlink" href="#logger_settings.DB_LOGGER_SETTINGS" title="Link to this definition"></a></dt>
+<dd><p>Settings for the database sink part of logs going to both DB and stdout.
+Requires serialization for the custom SQLite sink.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="logger_settings.DB_ONLY_LOGGER_SETTINGS">
+<span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">DB_ONLY_LOGGER_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoggerSettings(denomination='DB_ONLY',</span> <span class="pre">level='INFO',</span> <span class="pre">format='&lt;fg</span> <span class="pre">#808080&gt;{time:YYYY/MM/DD</span> <span class="pre">HH:mm:ss}&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;fg</span> <span class="pre">#FFD700&gt;DB_ONLY&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;level&gt;{level:</span> <span class="pre">&lt;8}&lt;/level&gt;</span> <span class="pre">|</span> <span class="pre">&lt;cyan&gt;{name}:{function}:{line}&lt;/cyan&gt;</span> <span class="pre">-</span> <span class="pre">&lt;level&gt;{message}&lt;/level&gt;',</span> <span class="pre">colorize=False,</span> <span class="pre">serialize=True,</span> <span class="pre">catch=True)</span></em><a class="headerlink" href="#logger_settings.DB_ONLY_LOGGER_SETTINGS" title="Link to this definition"></a></dt>
+<dd><p>Settings for logs going only to the database.
+Requires serialization.</p>
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="logger_settings.DB_STDOUT_LOGGER_SETTINGS">
+<span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">DB_STDOUT_LOGGER_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoggerSettings(denomination='DB+OUT',</span> <span class="pre">level='INFO',</span> <span class="pre">format='&lt;fg</span> <span class="pre">#808080&gt;{time:YYYY/MM/DD</span> <span class="pre">HH:mm:ss}&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;fg</span> <span class="pre">#FFD700&gt;DB+OUT&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;level&gt;{level:</span> <span class="pre">&lt;8}&lt;/level&gt;</span> <span class="pre">|</span> <span class="pre">&lt;cyan&gt;{name}:{function}:{line}&lt;/cyan&gt;</span> <span class="pre">-</span> <span class="pre">&lt;level&gt;{message}&lt;/level&gt;',</span> <span class="pre">colorize=True,</span> <span class="pre">serialize=False,</span> <span class="pre">catch=False)</span></em><a class="headerlink" href="#logger_settings.DB_STDOUT_LOGGER_SETTINGS" title="Link to this definition"></a></dt>
+<dd><p>Settings for the standard output part of logs going to both DB and stdout.</p>
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="logger_settings.LogLevel">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">LogLevel</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">*</span></span><span class="n"><span class="pre">values</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logger_settings.html#LogLevel"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#logger_settings.LogLevel" title="Link to this definition"></a></dt>
+<dd><p>Bases: <a class="reference external" href="https://docs.python.org/3/library/enum.html#enum.Enum" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">Enum</span></code></a></p>
+<p>Enumeration defining standard logging levels compatible with Loguru.</p>
+<p>Provides named constants for log severity levels.</p>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.CRITICAL">
+<span class="sig-name descname"><span class="pre">CRITICAL</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'CRITICAL'</span></em><a class="headerlink" href="#logger_settings.LogLevel.CRITICAL" title="Link to this definition"></a></dt>
+<dd><p>A serious error, indicating that the program itself may be unable to continue running.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.DEBUG">
+<span class="sig-name descname"><span class="pre">DEBUG</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'DEBUG'</span></em><a class="headerlink" href="#logger_settings.LogLevel.DEBUG" title="Link to this definition"></a></dt>
+<dd><p>Detailed information, typically of interest only when diagnosing problems.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.ERROR">
+<span class="sig-name descname"><span class="pre">ERROR</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'ERROR'</span></em><a class="headerlink" href="#logger_settings.LogLevel.ERROR" title="Link to this definition"></a></dt>
+<dd><p>Due to a more serious problem, the software has not been able to perform some function.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.INFO">
+<span class="sig-name descname"><span class="pre">INFO</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'INFO'</span></em><a class="headerlink" href="#logger_settings.LogLevel.INFO" title="Link to this definition"></a></dt>
+<dd><p>Confirmation that things are working as expected.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.SUCCESS">
+<span class="sig-name descname"><span class="pre">SUCCESS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'SUCCESS'</span></em><a class="headerlink" href="#logger_settings.LogLevel.SUCCESS" title="Link to this definition"></a></dt>
+<dd><p>Indicates successful completion of an operation (Loguru specific).</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.TRACE">
+<span class="sig-name descname"><span class="pre">TRACE</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'TRACE'</span></em><a class="headerlink" href="#logger_settings.LogLevel.TRACE" title="Link to this definition"></a></dt>
+<dd><p>Detailed information, typically of interest only when diagnosing problems.</p>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LogLevel.WARNING">
+<span class="sig-name descname"><span class="pre">WARNING</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">'WARNING'</span></em><a class="headerlink" href="#logger_settings.LogLevel.WARNING" title="Link to this definition"></a></dt>
+<dd><p>An indication that something unexpected happened, or indicative of some problem in the near future.</p>
+</dd></dl>
+
+</dd></dl>
+
+<dl class="py class">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings">
+<em class="property"><span class="k"><span class="pre">class</span></span><span class="w"> </span></em><span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">LoggerSettings</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="o"><span class="pre">**</span></span><span class="n"><span class="pre">data</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logger_settings.html#LoggerSettings"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#logger_settings.LoggerSettings" title="Link to this definition"></a></dt>
+<dd><p>Bases: <code class="xref py py-class docutils literal notranslate"><span class="pre">BaseModel</span></code></p>
+<p>Pydantic model representing configuration settings for a Loguru sink.</p>
+<p>Defines the structure for logger settings, including denomination, level,
+format string, and flags for colorization, serialization, and exception catching.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Variables<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>denomination</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – An identifier for the logger/sink (e.g., «STDOUT», «DB»).</p></li>
+<li><p><strong>level</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – The minimum log level for this sink (uses LogLevel enum values).</p></li>
+<li><p><strong>format</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a><em> | </em><em>None</em>) – The Loguru format string. If None, generated automatically.</p></li>
+<li><p><strong>colorize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><em>bool</em></a>) – Whether to apply color codes to the output (for terminals).</p></li>
+<li><p><strong>serialize</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><em>bool</em></a>) – Whether to output logs as JSON (required for custom sinks like SQLiteSink).</p></li>
+<li><p><strong>catch</strong> (<a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><em>bool</em></a>) – Whether Loguru should automatically catch exceptions in the sink.</p></li>
+</ul>
+</dd>
+<dt class="field-even">Parámetros<span class="colon">:</span></dt>
+<dd class="field-even"><p><strong>data</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p>
+</dd>
+</dl>
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.catch">
+<span class="sig-name descname"><span class="pre">catch</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.catch" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.colorize">
+<span class="sig-name descname"><span class="pre">colorize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.colorize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.denomination">
+<span class="sig-name descname"><span class="pre">denomination</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.denomination" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.format">
+<span class="sig-name descname"><span class="pre">format</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a> <span class="pre">|</span> <a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.format" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.level">
+<span class="sig-name descname"><span class="pre">level</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">str</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.level" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.model_config">
+<span class="sig-name descname"><span class="pre">model_config</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><span class="pre">ClassVar[ConfigDict]</span></em><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">{}</span></em><a class="headerlink" href="#logger_settings.LoggerSettings.model_config" title="Link to this definition"></a></dt>
+<dd><p>Configuration for the model, should be a dictionary conforming to [<cite>ConfigDict</cite>][pydantic.config.ConfigDict].</p>
+</dd></dl>
+
+<dl class="py method">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.model_post_init">
+<span class="sig-name descname"><span class="pre">model_post_init</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">_LoggerSettings__context</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logger_settings.html#LoggerSettings.model_post_init"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#logger_settings.LoggerSettings.model_post_init" title="Link to this definition"></a></dt>
+<dd><p>Pydantic post-initialization hook.</p>
+<p>Automatically generates the format string using <cite>format_assigner</cite>
+if the <cite>format</cite> attribute was not explicitly provided during initialization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><ul class="simple">
+<li><p><strong>__context</strong> (<em>Any</em>) – The Pydantic model validation context (unused here).</p></li>
+<li><p><strong>_LoggerSettings__context</strong> (<span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/typing.html#typing.Any" title="(en Python versión 3.13)"><code class="xref py py-data docutils literal notranslate"><span class="pre">Any</span></code></a></span>)</p></li>
+</ul>
+</dd>
+<dt class="field-even">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-even"><p><span class="sphinx_autodoc_typehints-type"><a class="reference external" href="https://docs.python.org/3/library/constants.html#None" title="(en Python versión 3.13)"><code class="xref py py-obj docutils literal notranslate"><span class="pre">None</span></code></a></span></p>
+</dd>
+</dl>
+</dd></dl>
+
+<dl class="py attribute">
+<dt class="sig sig-object py" id="logger_settings.LoggerSettings.serialize">
+<span class="sig-name descname"><span class="pre">serialize</span></span><em class="property"><span class="p"><span class="pre">:</span></span><span class="w"> </span><a class="reference external" href="https://docs.python.org/3/library/functions.html#bool" title="(en Python versión 3.13)"><code class="xref py py-class docutils literal notranslate"><span class="pre">bool</span></code></a></em><a class="headerlink" href="#logger_settings.LoggerSettings.serialize" title="Link to this definition"></a></dt>
+<dd></dd></dl>
+
+</dd></dl>
+
+<dl class="py data">
+<dt class="sig sig-object py" id="logger_settings.STDOUT_LOGGER_SETTINGS">
+<span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">STDOUT_LOGGER_SETTINGS</span></span><em class="property"><span class="w"> </span><span class="p"><span class="pre">=</span></span><span class="w"> </span><span class="pre">LoggerSettings(denomination='STDOUT',</span> <span class="pre">level='INFO',</span> <span class="pre">format='&lt;fg</span> <span class="pre">#808080&gt;{time:YYYY/MM/DD</span> <span class="pre">HH:mm:ss}&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;fg</span> <span class="pre">#FFD700&gt;STDOUT&lt;/&gt;</span> <span class="pre">|</span> <span class="pre">&lt;level&gt;{level:</span> <span class="pre">&lt;8}&lt;/level&gt;</span> <span class="pre">|</span> <span class="pre">&lt;cyan&gt;{name}:{function}:{line}&lt;/cyan&gt;</span> <span class="pre">-</span> <span class="pre">&lt;level&gt;{message}&lt;/level&gt;',</span> <span class="pre">colorize=True,</span> <span class="pre">serialize=False,</span> <span class="pre">catch=False)</span></em><a class="headerlink" href="#logger_settings.STDOUT_LOGGER_SETTINGS" title="Link to this definition"></a></dt>
+<dd><p>Settings for logging informational messages and above only to standard output.</p>
+</dd></dl>
+
+<dl class="py function">
+<dt class="sig sig-object py" id="logger_settings.format_assigner">
+<span class="sig-prename descclassname"><span class="pre">logger_settings.</span></span><span class="sig-name descname"><span class="pre">format_assigner</span></span><span class="sig-paren">(</span><em class="sig-param"><span class="n"><span class="pre">denomination</span></span></em><span class="sig-paren">)</span><a class="reference internal" href="_modules/logger_settings.html#format_assigner"><span class="viewcode-link"><span class="pre">[fuente]</span></span></a><a class="headerlink" href="#logger_settings.format_assigner" title="Link to this definition"></a></dt>
+<dd><p>Generates a Loguru format string including a custom denomination.</p>
+<p>Constructs a format string incorporating timestamp, logger denomination,
+level, code location (name:function:line), and the log message itself,
+using Loguru’s rich text formatting tags for colorization.</p>
+<dl class="field-list simple">
+<dt class="field-odd">Parámetros<span class="colon">:</span></dt>
+<dd class="field-odd"><p><strong>denomination</strong> (<a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)"><em>str</em></a>) – A string identifier for the logger instance (e.g., «STDOUT», «DB»).</p>
+</dd>
+<dt class="field-even">Devuelve<span class="colon">:</span></dt>
+<dd class="field-even"><p>A Loguru-compatible format string.</p>
+</dd>
+<dt class="field-odd">Tipo del valor devuelto<span class="colon">:</span></dt>
+<dd class="field-odd"><p><a class="reference external" href="https://docs.python.org/3/library/stdtypes.html#str" title="(en Python versión 3.13)">str</a></p>
+</dd>
+</dl>
+<dl class="simple">
+<dt>Reference:</dt><dd><p>Loguru format documentation: <a class="reference external" href="https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add">https://loguru.readthedocs.io/en/stable/api/logger.html#loguru._logger.Logger.add</a></p>
+</dd>
+</dl>
+</dd></dl>
+
+</section>
+
+
+           </div>
+          </div>
+          <footer><div class="rst-footer-buttons" role="navigation" aria-label="Pie de página">
+        <a href="log_db.html" class="btn btn-neutral float-left" title="Configuración de Logging (log_db)" accesskey="p" rel="prev"><span class="fa fa-arrow-circle-left" aria-hidden="true"></span> Anterior</a>
+        <a href="rate_limit_schemas.html" class="btn btn-neutral float-right" title="Esquemas de Rate Limit (rate_limit_schemas)" accesskey="n" rel="next">Siguiente <span class="fa fa-arrow-circle-right" aria-hidden="true"></span></a>
+    </div>
+
+  <hr/>
+
+  <div role="contentinfo">
+    <p>&#169; Derechos de autor 2025, Hugo Pessolano.</p>
+  </div>
+
+  Compilado con <a href="https://www.sphinx-doc.org/">Sphinx</a> usando un
+    <a href="https://github.com/readthedocs/sphinx_rtd_theme">tema</a>
+    proporcionado por <a href="https://readthedocs.org">Read the Docs</a>.
+   
+
+</footer>
+        </div>
+      </div>
+    </section>
+  </div>
+  <script>
+      jQuery(function () {
+          SphinxRtdTheme.Navigation.enable(true);
+      });
+  </script> 
+
+</body>
+</html>
