@@ -4,7 +4,7 @@ Welcome to **TS-Tools Replacement**, a Python library to streamline interaction 
 
 This README is available in multiple languages:
 
-- 🇬🇧 [English (You are here)](./README.md)
+- 🇬🇧 [English Version](./README.en.md)
 - 🇪🇸 [Versión en Español](./README.es.md)
 - 🇧🇷 [Versão em Português](./README.pt.md)
 
