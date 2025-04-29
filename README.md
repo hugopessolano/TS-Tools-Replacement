@@ -13,3 +13,5 @@ The README is available in multiple languages. Please refer to them for more inf
 This repository provides a set of tools to simplify the process of making requests to the Tiendanube API, efficiently handling rate limits, logging operations, and managing data in a structured way.
 
 Please select your preferred language from the list above to continue reading.
+
+You can also read the technical documentation in my GitHub Pages: https://hugopessolano.github.io/index.html
