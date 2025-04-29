@@ -51,6 +51,8 @@ Você pode acessá-la abrindo o seguinte arquivo em seu navegador:
 
 Essa documentação é a principal referência para entender a estrutura interna e o uso dos diferentes componentes da biblioteca.
 
+GitHub Pages: https://hugopessolano.github.io/index.html
+
 ![image](https://github.com/user-attachments/assets/76b303b8-b0df-47d4-8c45-c1eab45b3412)
 
 ## Sobre o Projeto
