@@ -2,7 +2,7 @@
 
 Welcome to **TS-Tools Replacement**, a Python library to streamline interaction with the **Tiendanube API**.
 
-This README is available in multiple languages:
+The README is available in multiple languages. Please refer to them for more info and details:
 
 - 🇬🇧 [English Version](./README.en.md)
 - 🇪🇸 [Versión en Español](./README.es.md)
