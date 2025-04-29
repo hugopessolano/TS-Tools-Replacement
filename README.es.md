@@ -44,6 +44,8 @@ Para poder instalarlo seguí los siguientes pasos:
 
 La documentación técnica detallada del proyecto, incluyendo la descripción de cada módulo, las clases, funciones y los esquemas Pydantic utilizados, se encuentra generada en formato HTML.
 
+GitHub Pages: https://hugopessolano.github.io/index.html
+
 Puedes acceder a ella abriendo el siguiente archivo en tu navegador web:
 
 **docs/build/html/index.html**
