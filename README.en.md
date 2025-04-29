@@ -45,6 +45,8 @@ Done! Your environment is now set up to start using or developing the library.
 
 The detailed technical documentation of the project—covering module descriptions, classes, functions, and the Pydantic schemas used—is generated in HTML format.
 
+GitHub Pages: https://hugopessolano.github.io/index.html
+
 You can open the following file in your web browser:
 
 **docs/build/html/index.html**
