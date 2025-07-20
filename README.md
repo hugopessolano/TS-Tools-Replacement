@@ -14,4 +14,4 @@ This repository provides a set of tools to simplify the process of making reques
 
 Please select your preferred language from the list above to continue reading.
 
-You can also read the technical documentation in my GitHub Pages: https://hugopessolano.github.io/index.html
+You can also read the technical documentation in my GitHub Pages: https://hugopessolano.github.io/TS-Tools-Replacement/
